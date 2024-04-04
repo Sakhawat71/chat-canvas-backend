@@ -1,14 +1,18 @@
 {
   "name": "chat-canvas-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "\"# b8a12-server-side-Sakhawat71\"",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongodb": "^6.5.0"
   }
 }
