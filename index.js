@@ -14,8 +14,6 @@ app.use(express.json())
 const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.vcouptk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 
-console.log(uri);
-
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
     serverApi: {
@@ -30,11 +28,42 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         client.connect();
 
+        const canvasUser = client.db('chatCanvas').collection('users');
 
 
 
+        /**
+         * ****************************************************************
+         * **************************  user  ******************************
+         * ****************************************************************
+         */
 
 
+        // add user 
+        app.post("/api/v1/add-user", async (req, res) => {
+            try {
+
+                const user = req.body;
+                const result = await canvasUser.insertOne(user);
+                res.send(result);
+
+            } catch (error) {
+                console.log("add user error : ",error);
+            }
+        })
+
+        // get user 
+
+        app.get("/api/v1/all-users", async(req,res) => {
+            try{
+
+                const result = await canvasUser.find().toArray();
+                res.send(result);
+
+            }catch(error){
+                console.log('all user error : ',error);
+            }
+        })
 
 
         // Send a ping to confirm a successful connection
