@@ -6,7 +6,12 @@ require('dotenv').config();
 const PORT = process.env.PORT || 5000;
 
 
-app.use(cors())
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+    ],
+    credentials: true,
+}))
 app.use(express.json())
 
 
@@ -28,40 +33,45 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         client.connect();
 
-        const canvasUser = client.db('chatCanvas').collection('users');
+        const canvasUsers = client.db('chatCanvas').collection('users');
 
 
 
         /**
          * ****************************************************************
-         * **************************  user  ******************************
+         * **************************  User  ******************************
          * ****************************************************************
          */
 
 
         // add user 
-        app.post("/api/v1/add-user", async (req, res) => {
+        app.put("/api/v1/add-user/:email", async (req, res) => {
             try {
 
+                const email = req.params.email;
+                const query = {email : email}
+                console.log(email);
+
                 const user = req.body;
-                const result = await canvasUser.insertOne(user);
-                res.send(result);
+                console.log(user);
+                // const result = await canvasUsers.insertOne(user);
+                // res.send(result);
 
             } catch (error) {
-                console.log("add user error : ",error);
+                console.log("add user error : ", error);
             }
         })
 
         // get user 
 
-        app.get("/api/v1/all-users", async(req,res) => {
-            try{
+        app.get("/api/v1/all-users", async (req, res) => {
+            try {
 
-                const result = await canvasUser.find().toArray();
+                const result = await canvasUsers.find().toArray();
                 res.send(result);
 
-            }catch(error){
-                console.log('all user error : ',error);
+            } catch (error) {
+                console.log('all user error : ', error);
             }
         })
 
