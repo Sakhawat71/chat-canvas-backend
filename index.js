@@ -49,13 +49,28 @@ async function run() {
             try {
 
                 const email = req.params.email;
-                const query = {email : email}
-                console.log(email);
-
                 const user = req.body;
-                console.log(user);
-                // const result = await canvasUsers.insertOne(user);
-                // res.send(result);
+
+                const filter = { email: email };
+                const options = { upsert: true };
+
+                const isExist = await canvasUsers.findOne(filter);
+                if (isExist) return res.send(isExist);
+
+                const result = await canvasUsers.updateOne(
+                    filter,
+                    {
+                        $set: { ...user }
+                    },
+                    options
+                )
+                res.send(result);
+
+                
+                // console.log('isExist : ',isExist);
+                // console.log( 'user :',user);
+                // console.log("result : " ,result);
+
 
             } catch (error) {
                 console.log("add user error : ", error);
