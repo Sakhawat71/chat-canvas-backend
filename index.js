@@ -55,7 +55,7 @@ async function run() {
                 const options = { upsert: true };
 
                 const isExist = await canvasUsers.findOne(filter);
-                if (isExist) return res.send(isExist);
+                if (isExist) return res.send({exist : true,message: "user already exist"});
 
                 const result = await canvasUsers.updateOne(
                     filter,
@@ -65,11 +65,6 @@ async function run() {
                     options
                 )
                 res.send(result);
-
-                
-                // console.log('isExist : ',isExist);
-                // console.log( 'user :',user);
-                // console.log("result : " ,result);
 
 
             } catch (error) {
