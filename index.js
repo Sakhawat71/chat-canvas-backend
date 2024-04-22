@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const PORT = process.env.PORT || 5000;
 
 
@@ -39,10 +40,26 @@ async function run() {
 
         /**
          * ****************************************************************
-         * **************************  User  ******************************
+         * ************************ User Releted Api **********************
          * ****************************************************************
          */
 
+
+        // jwt access token
+        app.post("/api/v1/jwt", async (req, res) => {
+
+            const userEmail = req.body;
+            const token = jwt.sign(userEmail, process.env.ACCESS_TOKEN, {
+                expiresIn: '365d',
+            });
+
+            res
+                .cookie('token', token, {
+                    httpOnly: true,
+
+                })
+                .send({seccess: true})
+        })
 
         // add user 
         app.put("/api/v1/add-user/:email", async (req, res) => {
@@ -55,7 +72,7 @@ async function run() {
                 const options = { upsert: true };
 
                 const isExist = await canvasUsers.findOne(filter);
-                if (isExist) return res.send({exist : true,message: "user already exist"});
+                if (isExist) return res.send({ exist: true, message: "user already exist" });
 
                 const result = await canvasUsers.updateOne(
                     filter,
