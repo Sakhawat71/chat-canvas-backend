@@ -62,6 +62,22 @@ async function run() {
                 .send({ seccess: true })
         })
 
+        
+        // remove jwt token
+        app.get('/api/v1/remove-jwt', async (req, res) => {
+            try {
+
+                res.clearCookie('token', {
+                    maxAge: 0,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                })
+                    .send({ seccess: true })
+            } catch (err) {
+                res.status(500).send(err)
+            }
+        })
+
         // add user 
         app.put("/api/v1/add-user/:email", async (req, res) => {
             try {
