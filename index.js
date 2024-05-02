@@ -35,6 +35,7 @@ async function run() {
         client.connect();
 
         const canvasUsers = client.db('chatCanvas').collection('users');
+        const canvasPosts = client.db('chatCanvas').collection('test');
 
 
 
@@ -62,7 +63,7 @@ async function run() {
                 .send({ seccess: true })
         })
 
-        
+
         // remove jwt token
         app.get('/api/v1/remove-jwt', async (req, res) => {
             try {
@@ -116,6 +117,17 @@ async function run() {
 
             } catch (error) {
                 console.log('all user error : ', error);
+            }
+        })
+
+        // get all post
+
+        app.get("/api/v1/test", async (req, res) => {
+            try {
+                const result = await canvasPosts.find().toArray();
+                res.send(result);
+            } catch (error) {
+                console.log('get error : ', error);
             }
         })
 
