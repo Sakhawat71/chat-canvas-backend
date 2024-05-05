@@ -36,6 +36,7 @@ async function run() {
 
         const canvasUsers = client.db('chatCanvas').collection('users');
         const canvasPosts = client.db('chatCanvas').collection('test');
+        const canvasAnnounce = client.db('chatCanvas').collection('announcement');
 
 
 
@@ -120,16 +121,59 @@ async function run() {
             }
         })
 
-        // get all post
+        /**
+         * ****************************************************************
+         * *********************** Admin Announcement Api *****************
+         * ****************************************************************
+         */
 
-        app.get("/api/v1/test", async (req, res) => {
+        app.get("/api/v1/announcement", async (req, res) => {
             try {
-                const result = await canvasPosts.find().toArray();
-                res.send(result);
+                const result = await canvasAnnounce.find().toArray();
+                const count = await canvasAnnounce.estimatedDocumentCount();
+
+                res.send({result,count})
             } catch (error) {
                 console.log('get error : ', error);
             }
         })
+
+
+        /**
+         * ****************************************************************
+         * ************************ POST Releted Api **********************
+         * ****************************************************************
+         */
+
+        // get all post
+        app.get("/api/v1/posts", async (req, res) => {
+            try {
+                const result = await canvasPosts.find().toArray();
+                res.send(result);
+
+            } catch (error) {
+                console.log('get error : ', error);
+            }
+        })
+
+        // total POST count
+        app.get('/api/v1/count', async (req, res) => {
+
+            try {
+                const count = await canvasPosts.estimatedDocumentCount();
+                const totalPost = count.toString();
+                res.send(totalPost);
+            } catch (error) {
+                console.error("Error fetching count:", error);
+                res.status(500).send("Error fetching count");
+            }
+        })
+
+
+
+
+
+
 
 
         // Send a ping to confirm a successful connection
