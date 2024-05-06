@@ -197,7 +197,7 @@ function run() {
              */
 
             app.get("/api/v1/announcement", function _callee5(req, res) {
-              var result, count;
+              var result;
               return regeneratorRuntime.async(function _callee5$(_context5) {
                 while (1) {
                   switch (_context5.prev = _context5.next) {
@@ -208,33 +208,25 @@ function run() {
 
                     case 3:
                       result = _context5.sent;
-                      _context5.next = 6;
-                      return regeneratorRuntime.awrap(canvasAnnounce.estimatedDocumentCount());
-
-                    case 6:
-                      count = _context5.sent;
-                      res.send({
-                        result: result,
-                        count: count
-                      });
-                      _context5.next = 13;
+                      res.send(result);
+                      _context5.next = 10;
                       break;
 
-                    case 10:
-                      _context5.prev = 10;
+                    case 7:
+                      _context5.prev = 7;
                       _context5.t0 = _context5["catch"](0);
                       console.log('get error : ', _context5.t0);
 
-                    case 13:
+                    case 10:
                     case "end":
                       return _context5.stop();
                   }
                 }
-              }, null, null, [[0, 10]]);
+              }, null, null, [[0, 7]]);
             }); // announcement count
 
             app.get('/api/v1/announcement-count', function _callee6(req, res) {
-              var result;
+              var result, count;
               return regeneratorRuntime.async(function _callee6$(_context6) {
                 while (1) {
                   switch (_context6.prev = _context6.next) {
@@ -245,21 +237,24 @@ function run() {
 
                     case 3:
                       result = _context6.sent;
-                      res.send(result);
-                      _context6.next = 10;
+                      count = result.toString();
+                      res.send(count);
+                      _context6.next = 13;
                       break;
 
-                    case 7:
-                      _context6.prev = 7;
+                    case 8:
+                      _context6.prev = 8;
                       _context6.t0 = _context6["catch"](0);
-                      console.log(_context6.t0);
+                      console.log('error in announcement-count');
+                      console.error('Error in announcement-count:', error);
+                      res.status(500).send('Error fetching announcement count');
 
-                    case 10:
+                    case 13:
                     case "end":
                       return _context6.stop();
                   }
                 }
-              }, null, null, [[0, 7]]);
+              }, null, null, [[0, 8]]);
             });
             /**
              * ****************************************************************

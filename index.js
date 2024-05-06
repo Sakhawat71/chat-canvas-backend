@@ -130,21 +130,23 @@ async function run() {
         app.get("/api/v1/announcement", async (req, res) => {
             try {
                 const result = await canvasAnnounce.find().toArray();
-                const count = await canvasAnnounce.estimatedDocumentCount();
 
-                res.send({result,count})
+                res.send(result)
             } catch (error) {
                 console.log('get error : ', error);
             }
         })
 
         // announcement count
-        app.get('/api/v1/announcement-count',async(req,res)=> {
-            try{
+        app.get('/api/v1/announcement-count', async (req, res) => {
+            try {
                 const result = await canvasAnnounce.estimatedDocumentCount();
-                res.send(result);
-            }catch(e){
-                console.log(e);
+                const count = result.toString();
+                res.send(count);
+            } catch (e) {
+                console.log('error in announcement-count');
+                console.error('Error in announcement-count:', error);
+                res.status(500).send('Error fetching announcement count');
             }
 
         })
