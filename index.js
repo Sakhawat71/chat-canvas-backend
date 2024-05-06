@@ -138,6 +138,16 @@ async function run() {
             }
         })
 
+        // announcement count
+        app.get('/api/v1/announcement-count',async(req,res)=> {
+            try{
+                const result = await canvasAnnounce.estimatedDocumentCount();
+                res.send(result);
+            }catch(e){
+                console.log(e);
+            }
+
+        })
 
         /**
          * ****************************************************************
