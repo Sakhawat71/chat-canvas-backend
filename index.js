@@ -140,11 +140,13 @@ async function run() {
         // announcement count
         app.get('/api/v1/announcement-count', async (req, res) => {
             try {
+
                 const result = await canvasAnnounce.estimatedDocumentCount();
                 const count = result.toString();
                 res.send(count);
-            } catch (e) {
-                console.log('error in announcement-count');
+
+            } catch (error) {
+
                 console.error('Error in announcement-count:', error);
                 res.status(500).send('Error fetching announcement count');
             }
@@ -157,10 +159,11 @@ async function run() {
          * ****************************************************************
          */
 
-        // get all post
-        app.get("/api/v1/posts", async (req, res) => {
+        // test api posts
+        app.get("/api/v1/test-posts", async (req, res) => {
             try {
-                const result = await canvasPosts.find().toArray();
+
+                const result = await canvasPosts.find().sort({ updatedAt: -1 }).toArray();
                 res.send(result);
 
             } catch (error) {
@@ -168,8 +171,22 @@ async function run() {
             }
         })
 
+
+        // get all post
+        app.get("/api/v1/posts", async (req, res) => {
+            try {
+
+                const result = await canvasPosts.find().toArray();
+                res.send(result);
+                
+
+            } catch (error) {
+                console.log('get error : ', error);
+            }
+        })
+
         // total POST count
-        app.get('/api/v1/count', async (req, res) => {
+        app.get('/api/v1/post-count', async (req, res) => {
 
             try {
                 const count = await canvasPosts.estimatedDocumentCount();
