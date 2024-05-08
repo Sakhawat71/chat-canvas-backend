@@ -38,9 +38,9 @@ var client = new MongoClient(uri, {
 
 function run() {
   var canvasUsers, canvasPosts, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context10) {
+  return regeneratorRuntime.async(function run$(_context9) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context9.prev = _context9.next) {
         case 0:
           try {
             // Connect the client to the server	(optional starting in v4.7)
@@ -260,9 +260,9 @@ function run() {
              * ************************ POST Releted Api **********************
              * ****************************************************************
              */
-            // test api posts
+            // get all post
 
-            app.get("/api/v1/test-posts", function _callee7(req, res) {
+            app.get("/api/v1/posts", function _callee7(req, res) {
               var result;
               return regeneratorRuntime.async(function _callee7$(_context7) {
                 while (1) {
@@ -271,7 +271,7 @@ function run() {
                       _context7.prev = 0;
                       _context7.next = 3;
                       return regeneratorRuntime.awrap(canvasPosts.find().sort({
-                        updatedAt: -1
+                        postTime: -1
                       }).toArray());
 
                     case 3:
@@ -291,63 +291,34 @@ function run() {
                   }
                 }
               }, null, null, [[0, 7]]);
-            }); // get all post
+            }); // total POST count
 
-            app.get("/api/v1/posts", function _callee8(req, res) {
-              var result;
+            app.get('/api/v1/post-count', function _callee8(req, res) {
+              var count, totalPost;
               return regeneratorRuntime.async(function _callee8$(_context8) {
                 while (1) {
                   switch (_context8.prev = _context8.next) {
                     case 0:
                       _context8.prev = 0;
                       _context8.next = 3;
-                      return regeneratorRuntime.awrap(canvasPosts.find().toArray());
-
-                    case 3:
-                      result = _context8.sent;
-                      res.send(result);
-                      _context8.next = 10;
-                      break;
-
-                    case 7:
-                      _context8.prev = 7;
-                      _context8.t0 = _context8["catch"](0);
-                      console.log('get error : ', _context8.t0);
-
-                    case 10:
-                    case "end":
-                      return _context8.stop();
-                  }
-                }
-              }, null, null, [[0, 7]]);
-            }); // total POST count
-
-            app.get('/api/v1/post-count', function _callee9(req, res) {
-              var count, totalPost;
-              return regeneratorRuntime.async(function _callee9$(_context9) {
-                while (1) {
-                  switch (_context9.prev = _context9.next) {
-                    case 0:
-                      _context9.prev = 0;
-                      _context9.next = 3;
                       return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
 
                     case 3:
-                      count = _context9.sent;
+                      count = _context8.sent;
                       totalPost = count.toString();
                       res.send(totalPost);
-                      _context9.next = 12;
+                      _context8.next = 12;
                       break;
 
                     case 8:
-                      _context9.prev = 8;
-                      _context9.t0 = _context9["catch"](0);
-                      console.error("Error fetching count:", _context9.t0);
+                      _context8.prev = 8;
+                      _context8.t0 = _context8["catch"](0);
+                      console.error("Error fetching count:", _context8.t0);
                       res.status(500).send("Error fetching count");
 
                     case 12:
                     case "end":
-                      return _context9.stop();
+                      return _context8.stop();
                   }
                 }
               }, null, null, [[0, 8]]);
@@ -360,7 +331,7 @@ function run() {
 
         case 1:
         case "end":
-          return _context10.stop();
+          return _context9.stop();
       }
     }
   });

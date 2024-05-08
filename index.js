@@ -159,26 +159,13 @@ async function run() {
          * ****************************************************************
          */
 
-        // test api posts
-        app.get("/api/v1/test-posts", async (req, res) => {
-            try {
-
-                const result = await canvasPosts.find().sort({ updatedAt: -1 }).toArray();
-                res.send(result);
-
-            } catch (error) {
-                console.log('get error : ', error);
-            }
-        })
-
-
         // get all post
         app.get("/api/v1/posts", async (req, res) => {
             try {
 
-                const result = await canvasPosts.find().toArray();
+                const result = await canvasPosts.find().sort({ postTime: -1 }).toArray();
                 res.send(result);
-                
+
 
             } catch (error) {
                 console.log('get error : ', error);
