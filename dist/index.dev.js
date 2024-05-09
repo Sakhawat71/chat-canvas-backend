@@ -38,9 +38,9 @@ var client = new MongoClient(uri, {
 
 function run() {
   var canvasUsers, canvasPosts, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context9) {
+  return regeneratorRuntime.async(function run$(_context10) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context10.prev = _context10.next) {
         case 0:
           try {
             // Connect the client to the server	(optional starting in v4.7)
@@ -322,6 +322,24 @@ function run() {
                   }
                 }
               }, null, null, [[0, 8]]);
+            }); // get sigele post
+
+            app.get('/api/v1/post-details/:id', function _callee9(req, res) {
+              var id;
+              return regeneratorRuntime.async(function _callee9$(_context9) {
+                while (1) {
+                  switch (_context9.prev = _context9.next) {
+                    case 0:
+                      id = req.params.id;
+                      console.log(id);
+                      res.send(id);
+
+                    case 3:
+                    case "end":
+                      return _context9.stop();
+                  }
+                }
+              });
             }); // Send a ping to confirm a successful connection
             // await client.db("admin").command({ ping: 1 });
             // console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -331,7 +349,7 @@ function run() {
 
         case 1:
         case "end":
-          return _context9.stop();
+          return _context10.stop();
       }
     }
   });

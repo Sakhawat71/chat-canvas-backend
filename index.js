@@ -185,7 +185,13 @@ async function run() {
             }
         })
 
-
+        // get sigele post
+        app.get('/api/v1/post-details/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            res.send(id)
+            
+        })
 
 
 
