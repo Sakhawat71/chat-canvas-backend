@@ -14,7 +14,8 @@ var cors = require('cors');
 
 var _require = require('mongodb'),
     MongoClient = _require.MongoClient,
-    ServerApiVersion = _require.ServerApiVersion;
+    ServerApiVersion = _require.ServerApiVersion,
+    ObjectId = _require.ObjectId;
 
 require('dotenv').config();
 
@@ -325,16 +326,23 @@ function run() {
             }); // get sigele post
 
             app.get('/api/v1/post-details/:id', function _callee9(req, res) {
-              var id;
+              var id, query, result;
               return regeneratorRuntime.async(function _callee9$(_context9) {
                 while (1) {
                   switch (_context9.prev = _context9.next) {
                     case 0:
                       id = req.params.id;
-                      console.log(id);
-                      res.send(id);
+                      query = {
+                        _id: new ObjectId(id)
+                      };
+                      _context9.next = 4;
+                      return regeneratorRuntime.awrap(canvasPosts.findOne());
 
-                    case 3:
+                    case 4:
+                      result = _context9.sent;
+                      res.send(result);
+
+                    case 6:
                     case "end":
                       return _context9.stop();
                   }
