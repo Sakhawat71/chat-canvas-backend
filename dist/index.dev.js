@@ -331,23 +331,44 @@ function run() {
                 while (1) {
                   switch (_context9.prev = _context9.next) {
                     case 0:
+                      _context9.prev = 0;
                       id = req.params.id;
                       query = {
-                        _id: new ObjectId(id)
-                      };
-                      _context9.next = 4;
-                      return regeneratorRuntime.awrap(canvasPosts.findOne());
+                        _id: id
+                      }; // let query = {_id: new ObjectId(id)};
+                      // console.log(" qeury: ",query);
+                      // let query;
+                      // if (ObjectId.isValid(id)) {
+                      //     query = { _id: new ObjectId(id) };
+                      //     console.log('object id: ',query);
+                      // } else {
+                      //     query = { _id: id };
+                      //     console.log('normal id',query);
+                      // }
 
-                    case 4:
+                      _context9.next = 5;
+                      return regeneratorRuntime.awrap(canvasPosts.findOne(query));
+
+                    case 5:
                       result = _context9.sent;
                       res.send(result);
+                      _context9.next = 13;
+                      break;
 
-                    case 6:
+                    case 9:
+                      _context9.prev = 9;
+                      _context9.t0 = _context9["catch"](0);
+                      res.send({
+                        error: _context9.t0
+                      });
+                      console.log(_context9.t0.message);
+
+                    case 13:
                     case "end":
                       return _context9.stop();
                   }
                 }
-              });
+              }, null, null, [[0, 9]]);
             }); // Send a ping to confirm a successful connection
             // await client.db("admin").command({ ping: 1 });
             // console.log("Pinged your deployment. You successfully connected to MongoDB!");

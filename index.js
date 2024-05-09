@@ -187,13 +187,29 @@ async function run() {
 
         // get sigele post
         app.get('/api/v1/post-details/:id', async (req, res) => {
+            try {
 
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
+                const id = req.params.id;
+                const query = {_id: id}
+                // let query = {_id: new ObjectId(id)};
+                // console.log(" qeury: ",query);
 
-            const result = await canvasPosts.findOne();
-            res.send(result);
+                // let query;
+                // if (ObjectId.isValid(id)) {
+                //     query = { _id: new ObjectId(id) };
+                //     console.log('object id: ',query);
+                // } else {
+                //     query = { _id: id };
+                //     console.log('normal id',query);
+                // }
 
+                const result = await canvasPosts.findOne(query);
+                res.send(result);
+
+            } catch (error) {
+                res.send({ error })
+                console.log(error.message);
+            }
         })
 
 
