@@ -195,7 +195,7 @@ async function run() {
         })
 
         // get sigele post
-        app.get('/api/v1/post-details/:id', async (req, res) => {email : email
+        app.get('/api/v1/post-details/:id', async (req, res) => {
             try {
 
                 const id = req.params.id;

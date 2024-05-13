@@ -108,17 +108,16 @@ function run() {
             }); // add user 
 
             app.put("/api/v1/add-user/:email", function _callee3(req, res) {
-              var _email, user, filter, options, isExist, result;
-
+              var email, user, filter, options, isExist, result;
               return regeneratorRuntime.async(function _callee3$(_context3) {
                 while (1) {
                   switch (_context3.prev = _context3.next) {
                     case 0:
                       _context3.prev = 0;
-                      _email = req.params.email;
+                      email = req.params.email;
                       user = req.body;
                       filter = {
-                        email: _email
+                        email: email
                       };
                       options = {
                         upsert: true
@@ -357,9 +356,7 @@ function run() {
                 while (1) {
                   switch (_context10.prev = _context10.next) {
                     case 0:
-                      email: email;
-
-                      _context10.prev = 1;
+                      _context10.prev = 0;
                       id = req.params.id;
                       query = {
                         _id: id
@@ -374,29 +371,29 @@ function run() {
                       //     console.log('normal id',query);
                       // }
 
-                      _context10.next = 6;
+                      _context10.next = 5;
                       return regeneratorRuntime.awrap(canvasPosts.findOne(query));
 
-                    case 6:
+                    case 5:
                       result = _context10.sent;
                       res.send(result);
-                      _context10.next = 14;
+                      _context10.next = 13;
                       break;
 
-                    case 10:
-                      _context10.prev = 10;
-                      _context10.t0 = _context10["catch"](1);
+                    case 9:
+                      _context10.prev = 9;
+                      _context10.t0 = _context10["catch"](0);
                       res.send({
                         error: _context10.t0
                       });
                       console.log(_context10.t0.message);
 
-                    case 14:
+                    case 13:
                     case "end":
                       return _context10.stop();
                   }
                 }
-              }, null, null, [[1, 10]]);
+              }, null, null, [[0, 9]]);
             }); // Send a ping to confirm a successful connection
             // await client.db("admin").command({ ping: 1 });
             // console.log("Pinged your deployment. You successfully connected to MongoDB!");
