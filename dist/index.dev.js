@@ -39,9 +39,9 @@ var client = new MongoClient(uri, {
 
 function run() {
   var canvasUsers, canvasPosts, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context10) {
+  return regeneratorRuntime.async(function run$(_context11) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context11.prev = _context11.next) {
         case 0:
           try {
             // Connect the client to the server	(optional starting in v4.7)
@@ -108,16 +108,17 @@ function run() {
             }); // add user 
 
             app.put("/api/v1/add-user/:email", function _callee3(req, res) {
-              var email, user, filter, options, isExist, result;
+              var _email, user, filter, options, isExist, result;
+
               return regeneratorRuntime.async(function _callee3$(_context3) {
                 while (1) {
                   switch (_context3.prev = _context3.next) {
                     case 0:
                       _context3.prev = 0;
-                      email = req.params.email;
+                      _email = req.params.email;
                       user = req.body;
                       filter = {
-                        email: email
+                        email: _email
                       };
                       options = {
                         upsert: true
@@ -190,6 +191,31 @@ function run() {
                   }
                 }
               }, null, null, [[0, 7]]);
+            }); // single user 
+
+            app.get("/api/v1/user/:email", function _callee5(req, res) {
+              var userEmail, query, result;
+              return regeneratorRuntime.async(function _callee5$(_context5) {
+                while (1) {
+                  switch (_context5.prev = _context5.next) {
+                    case 0:
+                      userEmail = req.params.email;
+                      query = {
+                        email: userEmail
+                      };
+                      _context5.next = 4;
+                      return regeneratorRuntime.awrap(canvasUsers.findOne(query));
+
+                    case 4:
+                      result = _context5.sent;
+                      res.send(result);
+
+                    case 6:
+                    case "end":
+                      return _context5.stop();
+                  }
+                }
+              });
             });
             /**
              * ****************************************************************
@@ -197,61 +223,61 @@ function run() {
              * ****************************************************************
              */
 
-            app.get("/api/v1/announcement", function _callee5(req, res) {
+            app.get("/api/v1/announcement", function _callee6(req, res) {
               var result;
-              return regeneratorRuntime.async(function _callee5$(_context5) {
-                while (1) {
-                  switch (_context5.prev = _context5.next) {
-                    case 0:
-                      _context5.prev = 0;
-                      _context5.next = 3;
-                      return regeneratorRuntime.awrap(canvasAnnounce.find().toArray());
-
-                    case 3:
-                      result = _context5.sent;
-                      res.send(result);
-                      _context5.next = 10;
-                      break;
-
-                    case 7:
-                      _context5.prev = 7;
-                      _context5.t0 = _context5["catch"](0);
-                      console.log('get error : ', _context5.t0);
-
-                    case 10:
-                    case "end":
-                      return _context5.stop();
-                  }
-                }
-              }, null, null, [[0, 7]]);
-            }); // announcement count
-
-            app.get('/api/v1/announcement-count', function _callee6(req, res) {
-              var result, count;
               return regeneratorRuntime.async(function _callee6$(_context6) {
                 while (1) {
                   switch (_context6.prev = _context6.next) {
                     case 0:
                       _context6.prev = 0;
                       _context6.next = 3;
-                      return regeneratorRuntime.awrap(canvasAnnounce.estimatedDocumentCount());
+                      return regeneratorRuntime.awrap(canvasAnnounce.find().toArray());
 
                     case 3:
                       result = _context6.sent;
+                      res.send(result);
+                      _context6.next = 10;
+                      break;
+
+                    case 7:
+                      _context6.prev = 7;
+                      _context6.t0 = _context6["catch"](0);
+                      console.log('get error : ', _context6.t0);
+
+                    case 10:
+                    case "end":
+                      return _context6.stop();
+                  }
+                }
+              }, null, null, [[0, 7]]);
+            }); // announcement count
+
+            app.get('/api/v1/announcement-count', function _callee7(req, res) {
+              var result, count;
+              return regeneratorRuntime.async(function _callee7$(_context7) {
+                while (1) {
+                  switch (_context7.prev = _context7.next) {
+                    case 0:
+                      _context7.prev = 0;
+                      _context7.next = 3;
+                      return regeneratorRuntime.awrap(canvasAnnounce.estimatedDocumentCount());
+
+                    case 3:
+                      result = _context7.sent;
                       count = result.toString();
                       res.send(count);
-                      _context6.next = 12;
+                      _context7.next = 12;
                       break;
 
                     case 8:
-                      _context6.prev = 8;
-                      _context6.t0 = _context6["catch"](0);
-                      console.error('Error in announcement-count:', _context6.t0);
+                      _context7.prev = 8;
+                      _context7.t0 = _context7["catch"](0);
+                      console.error('Error in announcement-count:', _context7.t0);
                       res.status(500).send('Error fetching announcement count');
 
                     case 12:
                     case "end":
-                      return _context6.stop();
+                      return _context7.stop();
                   }
                 }
               }, null, null, [[0, 8]]);
@@ -263,80 +289,82 @@ function run() {
              */
             // get all post
 
-            app.get("/api/v1/posts", function _callee7(req, res) {
+            app.get("/api/v1/posts", function _callee8(req, res) {
               var result;
-              return regeneratorRuntime.async(function _callee7$(_context7) {
-                while (1) {
-                  switch (_context7.prev = _context7.next) {
-                    case 0:
-                      _context7.prev = 0;
-                      _context7.next = 3;
-                      return regeneratorRuntime.awrap(canvasPosts.find().sort({
-                        postTime: -1
-                      }).toArray());
-
-                    case 3:
-                      result = _context7.sent;
-                      res.send(result);
-                      _context7.next = 10;
-                      break;
-
-                    case 7:
-                      _context7.prev = 7;
-                      _context7.t0 = _context7["catch"](0);
-                      console.log('get error : ', _context7.t0);
-
-                    case 10:
-                    case "end":
-                      return _context7.stop();
-                  }
-                }
-              }, null, null, [[0, 7]]);
-            }); // total POST count
-
-            app.get('/api/v1/post-count', function _callee8(req, res) {
-              var count, totalPost;
               return regeneratorRuntime.async(function _callee8$(_context8) {
                 while (1) {
                   switch (_context8.prev = _context8.next) {
                     case 0:
                       _context8.prev = 0;
                       _context8.next = 3;
-                      return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
+                      return regeneratorRuntime.awrap(canvasPosts.find().sort({
+                        postTime: -1
+                      }).toArray());
 
                     case 3:
-                      count = _context8.sent;
-                      totalPost = count.toString();
-                      res.send(totalPost);
-                      _context8.next = 12;
+                      result = _context8.sent;
+                      res.send(result);
+                      _context8.next = 10;
                       break;
 
-                    case 8:
-                      _context8.prev = 8;
+                    case 7:
+                      _context8.prev = 7;
                       _context8.t0 = _context8["catch"](0);
-                      console.error("Error fetching count:", _context8.t0);
-                      res.status(500).send("Error fetching count");
+                      console.log('get error : ', _context8.t0);
 
-                    case 12:
+                    case 10:
                     case "end":
                       return _context8.stop();
                   }
                 }
-              }, null, null, [[0, 8]]);
-            }); // get sigele post
+              }, null, null, [[0, 7]]);
+            }); // total POST count
 
-            app.get('/api/v1/post-details/:id', function _callee9(req, res) {
-              var id, query, result;
+            app.get('/api/v1/post-count', function _callee9(req, res) {
+              var count, totalPost;
               return regeneratorRuntime.async(function _callee9$(_context9) {
                 while (1) {
                   switch (_context9.prev = _context9.next) {
                     case 0:
                       _context9.prev = 0;
+                      _context9.next = 3;
+                      return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
+
+                    case 3:
+                      count = _context9.sent;
+                      totalPost = count.toString();
+                      res.send(totalPost);
+                      _context9.next = 12;
+                      break;
+
+                    case 8:
+                      _context9.prev = 8;
+                      _context9.t0 = _context9["catch"](0);
+                      console.error("Error fetching count:", _context9.t0);
+                      res.status(500).send("Error fetching count");
+
+                    case 12:
+                    case "end":
+                      return _context9.stop();
+                  }
+                }
+              }, null, null, [[0, 8]]);
+            }); // get sigele post
+
+            app.get('/api/v1/post-details/:id', function _callee10(req, res) {
+              var id, query, result;
+              return regeneratorRuntime.async(function _callee10$(_context10) {
+                while (1) {
+                  switch (_context10.prev = _context10.next) {
+                    case 0:
+                      email: email;
+
+                      _context10.prev = 1;
                       id = req.params.id;
                       query = {
                         _id: id
                       }; // let query = {_id: new ObjectId(id)};
-                      // console.log(" qeury: ",query);
+                      // console.log(" query = {}: ",query);
                       // let query;
                       // if (ObjectId.isValid(id)) {
                       //     query = { _id: new ObjectId(id) };
@@ -346,29 +374,29 @@ function run() {
                       //     console.log('normal id',query);
                       // }
 
-                      _context9.next = 5;
+                      _context10.next = 6;
                       return regeneratorRuntime.awrap(canvasPosts.findOne(query));
 
-                    case 5:
-                      result = _context9.sent;
+                    case 6:
+                      result = _context10.sent;
                       res.send(result);
-                      _context9.next = 13;
+                      _context10.next = 14;
                       break;
 
-                    case 9:
-                      _context9.prev = 9;
-                      _context9.t0 = _context9["catch"](0);
+                    case 10:
+                      _context10.prev = 10;
+                      _context10.t0 = _context10["catch"](1);
                       res.send({
-                        error: _context9.t0
+                        error: _context10.t0
                       });
-                      console.log(_context9.t0.message);
+                      console.log(_context10.t0.message);
 
-                    case 13:
+                    case 14:
                     case "end":
-                      return _context9.stop();
+                      return _context10.stop();
                   }
                 }
-              }, null, null, [[0, 9]]);
+              }, null, null, [[1, 10]]);
             }); // Send a ping to confirm a successful connection
             // await client.db("admin").command({ ping: 1 });
             // console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -378,7 +406,7 @@ function run() {
 
         case 1:
         case "end":
-          return _context10.stop();
+          return _context11.stop();
       }
     }
   });

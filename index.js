@@ -121,6 +121,15 @@ async function run() {
             }
         })
 
+        // single user 
+        app.get("/api/v1/user/:email", async(req,res) => {
+            const userEmail = req.params.email;
+            const query = {email : userEmail}
+
+            const result = await canvasUsers.findOne(query);
+            res.send(result);
+        })
+
         /**
          * ****************************************************************
          * *********************** Admin Announcement Api *****************
@@ -186,13 +195,13 @@ async function run() {
         })
 
         // get sigele post
-        app.get('/api/v1/post-details/:id', async (req, res) => {
+        app.get('/api/v1/post-details/:id', async (req, res) => {email : email
             try {
 
                 const id = req.params.id;
                 const query = {_id: id}
                 // let query = {_id: new ObjectId(id)};
-                // console.log(" qeury: ",query);
+                // console.log(" query = {}: ",query);
 
                 // let query;
                 // if (ObjectId.isValid(id)) {
