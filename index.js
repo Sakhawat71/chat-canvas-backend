@@ -122,9 +122,9 @@ async function run() {
         })
 
         // single user 
-        app.get("/api/v1/user/:email", async(req,res) => {
+        app.get("/api/v1/user/:email", async (req, res) => {
             const userEmail = req.params.email;
-            const query = {email : userEmail}
+            const query = { email: userEmail }
 
             const result = await canvasUsers.findOne(query);
             res.send(result);
@@ -181,6 +181,17 @@ async function run() {
             }
         })
 
+        app.get("/api/v1/search-posts?query", async (req, res) => {
+            // const search = req.body;
+            // const query = { titel : search }
+            const query = req.query;
+            console.log("search: " , query);
+            const data = canvasPosts.find(query);
+            const result = await data.toArray()
+            res.send(result)
+        })
+
+
         // total POST count
         app.get('/api/v1/post-count', async (req, res) => {
 
@@ -199,7 +210,7 @@ async function run() {
             try {
 
                 const id = req.params.id;
-                const query = {_id: id}
+                const query = { _id: id }
                 // let query = {_id: new ObjectId(id)};
                 // console.log(" query = {}: ",query);
 

@@ -39,9 +39,9 @@ var client = new MongoClient(uri, {
 
 function run() {
   var canvasUsers, canvasPosts, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context11) {
+  return regeneratorRuntime.async(function run$(_context12) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context12.prev = _context12.next) {
         case 0:
           try {
             // Connect the client to the server	(optional starting in v4.7)
@@ -317,46 +317,71 @@ function run() {
                   }
                 }
               }, null, null, [[0, 7]]);
-            }); // total POST count
-
-            app.get('/api/v1/post-count', function _callee9(req, res) {
-              var count, totalPost;
+            });
+            app.get("/api/v1/search-posts?query", function _callee9(req, res) {
+              var query, data, result;
               return regeneratorRuntime.async(function _callee9$(_context9) {
                 while (1) {
                   switch (_context9.prev = _context9.next) {
                     case 0:
-                      _context9.prev = 0;
-                      _context9.next = 3;
-                      return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
+                      // const search = req.body;
+                      // const query = { titel : search }
+                      query = req.query;
+                      console.log("search: ", query);
+                      data = canvasPosts.find(query);
+                      _context9.next = 5;
+                      return regeneratorRuntime.awrap(data.toArray());
 
-                    case 3:
-                      count = _context9.sent;
-                      totalPost = count.toString();
-                      res.send(totalPost);
-                      _context9.next = 12;
-                      break;
+                    case 5:
+                      result = _context9.sent;
+                      res.send(result);
 
-                    case 8:
-                      _context9.prev = 8;
-                      _context9.t0 = _context9["catch"](0);
-                      console.error("Error fetching count:", _context9.t0);
-                      res.status(500).send("Error fetching count");
-
-                    case 12:
+                    case 7:
                     case "end":
                       return _context9.stop();
                   }
                 }
-              }, null, null, [[0, 8]]);
-            }); // get sigele post
+              });
+            }); // total POST count
 
-            app.get('/api/v1/post-details/:id', function _callee10(req, res) {
-              var id, query, result;
+            app.get('/api/v1/post-count', function _callee10(req, res) {
+              var count, totalPost;
               return regeneratorRuntime.async(function _callee10$(_context10) {
                 while (1) {
                   switch (_context10.prev = _context10.next) {
                     case 0:
                       _context10.prev = 0;
+                      _context10.next = 3;
+                      return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
+
+                    case 3:
+                      count = _context10.sent;
+                      totalPost = count.toString();
+                      res.send(totalPost);
+                      _context10.next = 12;
+                      break;
+
+                    case 8:
+                      _context10.prev = 8;
+                      _context10.t0 = _context10["catch"](0);
+                      console.error("Error fetching count:", _context10.t0);
+                      res.status(500).send("Error fetching count");
+
+                    case 12:
+                    case "end":
+                      return _context10.stop();
+                  }
+                }
+              }, null, null, [[0, 8]]);
+            }); // get sigele post
+
+            app.get('/api/v1/post-details/:id', function _callee11(req, res) {
+              var id, query, result;
+              return regeneratorRuntime.async(function _callee11$(_context11) {
+                while (1) {
+                  switch (_context11.prev = _context11.next) {
+                    case 0:
+                      _context11.prev = 0;
                       id = req.params.id;
                       query = {
                         _id: id
@@ -371,26 +396,26 @@ function run() {
                       //     console.log('normal id',query);
                       // }
 
-                      _context10.next = 5;
+                      _context11.next = 5;
                       return regeneratorRuntime.awrap(canvasPosts.findOne(query));
 
                     case 5:
-                      result = _context10.sent;
+                      result = _context11.sent;
                       res.send(result);
-                      _context10.next = 13;
+                      _context11.next = 13;
                       break;
 
                     case 9:
-                      _context10.prev = 9;
-                      _context10.t0 = _context10["catch"](0);
+                      _context11.prev = 9;
+                      _context11.t0 = _context11["catch"](0);
                       res.send({
-                        error: _context10.t0
+                        error: _context11.t0
                       });
-                      console.log(_context10.t0.message);
+                      console.log(_context11.t0.message);
 
                     case 13:
                     case "end":
-                      return _context10.stop();
+                      return _context11.stop();
                   }
                 }
               }, null, null, [[0, 9]]);
@@ -403,7 +428,7 @@ function run() {
 
         case 1:
         case "end":
-          return _context11.stop();
+          return _context12.stop();
       }
     }
   });
