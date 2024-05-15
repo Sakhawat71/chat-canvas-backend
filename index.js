@@ -181,14 +181,43 @@ async function run() {
             }
         })
 
-        app.get("/api/v1/search-posts?query", async (req, res) => {
-            // const search = req.body;
-            // const query = { titel : search }
-            const query = req.query;
-            console.log("search: " , query);
-            const data = canvasPosts.find(query);
-            const result = await data.toArray()
-            res.send(result)
+        app.get("/api/v1/search/:key", async (req, res) => {
+
+            // try {
+            //     const searchText = req.params.key;
+            //     const query = {
+            //         "$or": [
+            //             { "post.title": { $regex: searchText, $options: "i" } },
+            //             { "post.description": { $regex: searchText, $options: "i" } },
+            //             { "tag": { $regex: searchText, $options: "i" } }
+            //         ]
+            //     };
+            //     const result = await canvasPosts.find(query).toArray();
+            //     res.send(result);
+            // } catch (error) {
+            //     console.error("Error searching posts:", error);
+            //     res.status(500).send("Error searching posts");
+            // }
+
+
+            try {
+                const key = req.params.key;
+                const query = {
+                    "$or": [
+                        { "post.title": { $regex: key, $options: "i" } },
+                        { "post.description": { $regex: key, $options: "i" } },
+                        { "tag": { $regex: key, $options: "i" } }
+                    ]
+                }
+                const result = await canvasPosts.find(query).toArray();
+                res.send(result)
+
+            } catch (error) {
+                console.error("Error searching posts:", error);
+                res.status(500).send("Error searching posts");
+            }
+
+
         })
 
 

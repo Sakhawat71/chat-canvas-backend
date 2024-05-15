@@ -318,30 +318,53 @@ function run() {
                 }
               }, null, null, [[0, 7]]);
             });
-            app.get("/api/v1/search-posts?query", function _callee9(req, res) {
-              var query, data, result;
+            app.get("/api/v1/search/:key", function _callee9(req, res) {
+              var key, query, result;
               return regeneratorRuntime.async(function _callee9$(_context9) {
                 while (1) {
                   switch (_context9.prev = _context9.next) {
                     case 0:
-                      // const search = req.body;
-                      // const query = { titel : search }
-                      query = req.query;
-                      console.log("search: ", query);
-                      data = canvasPosts.find(query);
+                      _context9.prev = 0;
+                      key = req.params.key;
+                      query = {
+                        "$or": [{
+                          "post.title": {
+                            $regex: key,
+                            $options: "i"
+                          }
+                        }, {
+                          "post.description": {
+                            $regex: key,
+                            $options: "i"
+                          }
+                        }, {
+                          "tag": {
+                            $regex: key,
+                            $options: "i"
+                          }
+                        }]
+                      };
                       _context9.next = 5;
-                      return regeneratorRuntime.awrap(data.toArray());
+                      return regeneratorRuntime.awrap(canvasPosts.find(query).toArray());
 
                     case 5:
                       result = _context9.sent;
                       res.send(result);
+                      _context9.next = 13;
+                      break;
 
-                    case 7:
+                    case 9:
+                      _context9.prev = 9;
+                      _context9.t0 = _context9["catch"](0);
+                      console.error("Error searching posts:", _context9.t0);
+                      res.status(500).send("Error searching posts");
+
+                    case 13:
                     case "end":
                       return _context9.stop();
                   }
                 }
-              });
+              }, null, null, [[0, 9]]);
             }); // total POST count
 
             app.get('/api/v1/post-count', function _callee10(req, res) {
