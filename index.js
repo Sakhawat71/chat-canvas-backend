@@ -171,7 +171,8 @@ async function run() {
         // get all post
         app.get("/api/v1/posts", async (req, res) => {
             try {
-
+                const query = req.query.page;
+                console.log(query);
                 const result = await canvasPosts.find().sort({ postTime: -1 }).toArray();
                 res.send(result);
 
@@ -182,23 +183,6 @@ async function run() {
         })
 
         app.get("/api/v1/search/:key", async (req, res) => {
-
-            // try {
-            //     const searchText = req.params.key;
-            //     const query = {
-            //         "$or": [
-            //             { "post.title": { $regex: searchText, $options: "i" } },
-            //             { "post.description": { $regex: searchText, $options: "i" } },
-            //             { "tag": { $regex: searchText, $options: "i" } }
-            //         ]
-            //     };
-            //     const result = await canvasPosts.find(query).toArray();
-            //     res.send(result);
-            // } catch (error) {
-            //     console.error("Error searching posts:", error);
-            //     res.status(500).send("Error searching posts");
-            // }
-
 
             try {
                 const key = req.params.key;

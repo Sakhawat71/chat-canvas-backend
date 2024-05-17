@@ -289,34 +289,36 @@ function run() {
             // get all post
 
             app.get("/api/v1/posts", function _callee8(req, res) {
-              var result;
+              var query, result;
               return regeneratorRuntime.async(function _callee8$(_context8) {
                 while (1) {
                   switch (_context8.prev = _context8.next) {
                     case 0:
                       _context8.prev = 0;
-                      _context8.next = 3;
+                      query = req.query.page;
+                      console.log(query);
+                      _context8.next = 5;
                       return regeneratorRuntime.awrap(canvasPosts.find().sort({
                         postTime: -1
                       }).toArray());
 
-                    case 3:
+                    case 5:
                       result = _context8.sent;
                       res.send(result);
-                      _context8.next = 10;
+                      _context8.next = 12;
                       break;
 
-                    case 7:
-                      _context8.prev = 7;
+                    case 9:
+                      _context8.prev = 9;
                       _context8.t0 = _context8["catch"](0);
                       console.log('get error : ', _context8.t0);
 
-                    case 10:
+                    case 12:
                     case "end":
                       return _context8.stop();
                   }
                 }
-              }, null, null, [[0, 7]]);
+              }, null, null, [[0, 9]]);
             });
             app.get("/api/v1/search/:key", function _callee9(req, res) {
               var key, query, result;
