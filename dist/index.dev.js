@@ -372,15 +372,16 @@ function run() {
             }); // all posts and search post 
 
             app.get('/api/v2/posts', function _callee10(req, res) {
-              var page, search, query, result;
+              var page, size, search, query, result;
               return regeneratorRuntime.async(function _callee10$(_context10) {
                 while (1) {
                   switch (_context10.prev = _context10.next) {
                     case 0:
                       _context10.prev = 0;
                       page = parseInt(req.query.page) || 0;
-                      search = req.query.search;
-                      console.log("qeury params ", page); // const page = req.body;
+                      size = 5;
+                      search = req.query.search; // console.log("qeury params ", page);
+                      // const page = req.body;
                       // console.log("body data ", page);
 
                       query = {
@@ -404,7 +405,7 @@ function run() {
                       _context10.next = 7;
                       return regeneratorRuntime.awrap(canvasPosts.find(query).sort({
                         postTime: -1
-                      }).toArray());
+                      }).skip(size * page).limit(size).toArray());
 
                     case 7:
                       result = _context10.sent;

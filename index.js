@@ -213,9 +213,10 @@ async function run() {
             try {
 
                 const page = parseInt(req.query.page) || 0;
+                const size = 5;
                 const search = req.query.search;
 
-                console.log("qeury params ", page);
+                // console.log("qeury params ", page);
 
                 // const page = req.body;
                 // console.log("body data ", page);
@@ -231,6 +232,8 @@ async function run() {
                 const result = await canvasPosts
                     .find(query)
                     .sort({ postTime: -1 })
+                    .skip(size * page)
+                    .limit(size)
                     .toArray()
 
                 res.send(result)
