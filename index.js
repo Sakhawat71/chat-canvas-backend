@@ -171,17 +171,23 @@ async function run() {
         // get all post
         app.get("/api/v1/posts", async (req, res) => {
             try {
-                const query = req.query.page;
-                console.log(query);
-                const result = await canvasPosts.find().sort({ postTime: -1 }).toArray();
-                res.send(result);
+                const page = parseInt(req.query.page) || 0;
+                const size = 5;
 
+                console.log('page', page, "size", size);
+                const result = await canvasPosts.find()
+                    .sort({ postTime: -1 })
+                    .skip(page * size)
+                    .limit(size)
+                    .toArray();
+                res.send(result);
 
             } catch (error) {
                 console.log('get error : ', error);
             }
         })
 
+        // search api ** not in use
         app.get("/api/v1/search/:key", async (req, res) => {
 
             try {
@@ -200,8 +206,39 @@ async function run() {
                 console.error("Error searching posts:", error);
                 res.status(500).send("Error searching posts");
             }
+        })
+        
+        // all posts and search post 
+        app.get('/api/v2/posts', async (req, res) => {
+            try {
 
+                const page = parseInt(req.query.page) || 0;
+                const search = req.query.search;
 
+                console.log("qeury params ", page);
+
+                // const page = req.body;
+                // console.log("body data ", page);
+
+                const query = {
+                    "$or": [
+                        { "post.title": { $regex: search, $options: "i" } },
+                        { "post.description": { $regex: search, $options: "i" } },
+                        { "tag": { $regex: search, $options: "i" } }
+                    ]
+                }
+
+                const result = await canvasPosts
+                    .find(query)
+                    .sort({ postTime: -1 })
+                    .toArray()
+
+                res.send(result)
+
+            } catch (error) {
+                res.status(500).send("Error fetching posts");
+                console.log("Error fetching posts ", error);
+            }
         })
 
 
@@ -226,15 +263,6 @@ async function run() {
                 const query = { _id: id }
                 // let query = {_id: new ObjectId(id)};
                 // console.log(" query = {}: ",query);
-
-                // let query;
-                // if (ObjectId.isValid(id)) {
-                //     query = { _id: new ObjectId(id) };
-                //     console.log('object id: ',query);
-                // } else {
-                //     query = { _id: id };
-                //     console.log('normal id',query);
-                // }
 
                 const result = await canvasPosts.findOne(query);
                 res.send(result);
