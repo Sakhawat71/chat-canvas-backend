@@ -168,7 +168,7 @@ async function run() {
          * ****************************************************************
          */
 
-        // get all post
+        // get all post ** not in use ** old v1 all posts
         app.get("/api/v1/posts", async (req, res) => {
             try {
                 const page = parseInt(req.query.page) || 0;
@@ -187,15 +187,15 @@ async function run() {
             }
         })
 
-        // search api ** not in use
+        // search api **  use for tag
         app.get("/api/v1/search/:key", async (req, res) => {
 
             try {
                 const key = req.params.key;
                 const query = {
                     "$or": [
-                        { "post.title": { $regex: key, $options: "i" } },
-                        { "post.description": { $regex: key, $options: "i" } },
+                        // { "post.title": { $regex: key, $options: "i" } },
+                        // { "post.description": { $regex: key, $options: "i" } },
                         { "tag": { $regex: key, $options: "i" } }
                     ]
                 }
@@ -207,7 +207,7 @@ async function run() {
                 res.status(500).send("Error searching posts");
             }
         })
-        
+
         // all posts and search post 
         app.get('/api/v2/posts', async (req, res) => {
             try {
@@ -215,11 +215,6 @@ async function run() {
                 const page = parseInt(req.query.page) || 0;
                 const size = 5;
                 const search = req.query.search;
-
-                // console.log("qeury params ", page);
-
-                // const page = req.body;
-                // console.log("body data ", page);
 
                 const query = {
                     "$or": [
@@ -229,8 +224,7 @@ async function run() {
                     ]
                 }
 
-                const result = await canvasPosts
-                    .find(query)
+                const result = await canvasPosts.find(query)
                     .sort({ postTime: -1 })
                     .skip(size * page)
                     .limit(size)

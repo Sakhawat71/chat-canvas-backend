@@ -286,7 +286,7 @@ function run() {
              * ************************ POST Releted Api **********************
              * ****************************************************************
              */
-            // get all post
+            // get all post ** not in use ** old v1 all posts
 
             app.get("/api/v1/posts", function _callee8(req, res) {
               var page, size, result;
@@ -320,7 +320,7 @@ function run() {
                   }
                 }
               }, null, null, [[0, 10]]);
-            }); // search api ** not in use
+            }); // search api **  use for tag
 
             app.get("/api/v1/search/:key", function _callee9(req, res) {
               var key, query, result;
@@ -331,17 +331,9 @@ function run() {
                       _context9.prev = 0;
                       key = req.params.key;
                       query = {
-                        "$or": [{
-                          "post.title": {
-                            $regex: key,
-                            $options: "i"
-                          }
-                        }, {
-                          "post.description": {
-                            $regex: key,
-                            $options: "i"
-                          }
-                        }, {
+                        "$or": [// { "post.title": { $regex: key, $options: "i" } },
+                        // { "post.description": { $regex: key, $options: "i" } },
+                        {
                           "tag": {
                             $regex: key,
                             $options: "i"
@@ -380,10 +372,7 @@ function run() {
                       _context10.prev = 0;
                       page = parseInt(req.query.page) || 0;
                       size = 5;
-                      search = req.query.search; // console.log("qeury params ", page);
-                      // const page = req.body;
-                      // console.log("body data ", page);
-
+                      search = req.query.search;
                       query = {
                         "$or": [{
                           "post.title": {
