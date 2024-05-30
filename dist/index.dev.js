@@ -38,7 +38,7 @@ var client = new MongoClient(uri, {
 });
 
 function run() {
-  var canvasUsers, canvasPosts, canvasComments, canvasAnnounce;
+  var canvasUsers, canvasPosts, canvasPostTest, canvasComments, canvasAnnounce;
   return regeneratorRuntime.async(function run$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
@@ -48,13 +48,14 @@ function run() {
             client.connect();
             canvasUsers = client.db('chatCanvas').collection('users');
             canvasPosts = client.db('chatCanvas').collection('test');
+            canvasPostTest = client.db('chatCanvas').collection('posts');
             canvasComments = client.db('chatCanvas').collection('comments');
             canvasAnnounce = client.db('chatCanvas').collection('announcement');
             /**
              * ****************************************************************
              * ************************ User Releted Api **********************
              * ****************************************************************
-             */
+            */
             // jwt access token
 
             app.post("/api/v1/jwt", function _callee(req, res) {
@@ -221,7 +222,7 @@ function run() {
              * ****************************************************************
              * *********************** Admin Announcement Api *****************
              * ****************************************************************
-             */
+            */
 
             app.get("/api/v1/announcement", function _callee6(req, res) {
               var result;
@@ -286,8 +287,8 @@ function run() {
              * ****************************************************************
              * ************************ POST Releted Api **********************
              * ****************************************************************
-             */
-            // get all post ** not in use ** old v1 all posts
+            */
+            // get all post ** not in use ** old v1 all posts router
 
             app.get("/api/v1/posts", function _callee8(req, res) {
               var page, size, result;
@@ -297,30 +298,71 @@ function run() {
                     case 0:
                       _context8.prev = 0;
                       page = parseInt(req.query.page) || 0;
-                      size = 5;
-                      console.log('page', page, "size", size);
-                      _context8.next = 6;
-                      return regeneratorRuntime.awrap(canvasPosts.find().sort({
-                        postTime: -1
-                      }).skip(page * size).limit(size).toArray());
+                      size = 10;
+                      _context8.next = 5;
+                      return regeneratorRuntime.awrap(canvasPostTest.aggregate([// {
+                      //     $lookup: {
+                      //         from: 'comments',
+                      //         localField: '_id',
+                      //         foreignField: `new ObjectId('${postId}')`,
+                      //         as: 'comments'
+                      //     }
+                      // },
+                      {
+                        $lookup: {
+                          from: 'comments',
+                          "let": {
+                            postId: '$_id'
+                          },
+                          pipeline: [{
+                            $match: {
+                              $expr: {
+                                $eq: ['$postId', {
+                                  $toString: '$$postId'
+                                }]
+                              }
+                            }
+                          }],
+                          as: 'comments'
+                        }
+                      }, {
+                        $addFields: {
+                          commentCount: {
+                            $size: '$comments'
+                          }
+                        }
+                      }, {
+                        $sort: {
+                          postTime: -1
+                        }
+                      }, {
+                        $skip: page * size
+                      }, {
+                        $limit: size
+                      }, {
+                        $project: {
+                          comments: 0 // Exclude comments array from the result
 
-                    case 6:
+                        }
+                      }]).toArray());
+
+                    case 5:
                       result = _context8.sent;
                       res.send(result);
-                      _context8.next = 13;
+                      _context8.next = 12;
                       break;
 
-                    case 10:
-                      _context8.prev = 10;
+                    case 9:
+                      _context8.prev = 9;
                       _context8.t0 = _context8["catch"](0);
                       console.log('get error : ', _context8.t0);
 
-                    case 13:
+                    case 12:
                     case "end":
                       return _context8.stop();
                   }
                 }
-              }, null, null, [[0, 10]]);
+              }, null, null, [[0, 9]]);
             }); // search api **  use for tag
 
             app.get("/api/v1/search/:key", function _callee9(req, res) {
@@ -484,7 +526,7 @@ function run() {
             /** *******************************************************************
              * ************************** Comments Api  ***************************
              * ********************************************************************
-             */
+            */
 
             app.get('/api/v1/comments/:pId', function _callee13(req, res) {
               var postId, query, result;

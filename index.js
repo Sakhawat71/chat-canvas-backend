@@ -36,6 +36,7 @@ async function run() {
 
         const canvasUsers = client.db('chatCanvas').collection('users');
         const canvasPosts = client.db('chatCanvas').collection('test');
+        const canvasPostTest = client.db('chatCanvas').collection('posts');
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
 
@@ -45,7 +46,7 @@ async function run() {
          * ****************************************************************
          * ************************ User Releted Api **********************
          * ****************************************************************
-         */
+        */
 
 
         // jwt access token
@@ -135,7 +136,7 @@ async function run() {
          * ****************************************************************
          * *********************** Admin Announcement Api *****************
          * ****************************************************************
-         */
+        */
 
         app.get("/api/v1/announcement", async (req, res) => {
             try {
@@ -167,21 +168,63 @@ async function run() {
          * ****************************************************************
          * ************************ POST Releted Api **********************
          * ****************************************************************
-         */
+        */
 
-        // get all post ** not in use ** old v1 all posts
+        // get all post ** not in use ** old v1 all posts router
         app.get("/api/v1/posts", async (req, res) => {
             try {
                 const page = parseInt(req.query.page) || 0;
-                const size = 5;
+                const size = 10;
 
-                console.log('page', page, "size", size);
-                const result = await canvasPosts.find()
-                    .sort({ postTime: -1 })
-                    .skip(page * size)
-                    .limit(size)
-                    .toArray();
-                res.send(result);
+                const result = await canvasPostTest.aggregate([
+                    
+                    // {
+                    //     $lookup: {
+                    //         from: 'comments',
+                    //         localField: '_id',
+                    //         foreignField: `new ObjectId('${postId}')`,
+                    //         as: 'comments'
+                    //     }
+                    // },
+                    {
+                        $lookup: {
+                            from: 'comments',
+                            let: { postId: '$_id' },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ['$postId', { $toString: '$$postId' }]
+                                        }
+                                    }
+                                }
+                            ],
+                            as: 'comments'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            commentCount: { $size: '$comments' }
+                        }
+                    },
+                    {
+                        $sort: { postTime: -1 }
+                    },
+                    {
+                        $skip: page * size
+                    },
+                    {
+                        $limit: size
+                    },
+                    {
+                        $project: {
+                            comments: 0 // Exclude comments array from the result
+                        }
+                    }
+                    
+                ]).toArray()
+
+                res.send(result)
 
             } catch (error) {
                 console.log('get error : ', error);
@@ -271,14 +314,14 @@ async function run() {
         /** *******************************************************************
          * ************************** Comments Api  ***************************
          * ********************************************************************
-         */
+        */
 
-        app.get('/api/v1/comments/:pId', async(req,res) => {
+        app.get('/api/v1/comments/:pId', async (req, res) => {
 
             const postId = req.params.pId;
-            const query = {postId : postId}
+            const query = { postId: postId }
             const result = await canvasComments.find(query).toArray()
-            res.send(result) 
+            res.send(result)
         })
 
 
