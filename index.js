@@ -36,6 +36,7 @@ async function run() {
 
         const canvasUsers = client.db('chatCanvas').collection('users');
         const canvasPosts = client.db('chatCanvas').collection('test');
+        const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
 
 
@@ -193,11 +194,7 @@ async function run() {
             try {
                 const key = req.params.key;
                 const query = {
-                    "$or": [
-                        // { "post.title": { $regex: key, $options: "i" } },
-                        // { "post.description": { $regex: key, $options: "i" } },
-                        { "tag": { $regex: key, $options: "i" } }
-                    ]
+                    "tag": { $regex: key, $options: "i" }
                 }
                 const result = await canvasPosts.find(query).toArray();
                 res.send(result)
@@ -271,6 +268,18 @@ async function run() {
         })
 
 
+        /** *******************************************************************
+         * ************************** Comments Api  ***************************
+         * ********************************************************************
+         */
+
+        app.get('/api/v1/comments/:pId', async(req,res) => {
+
+            const postId = req.params.pId;
+            const query = {postId : postId}
+            const result = await canvasComments.find(query).toArray()
+            res.send(result) 
+        })
 
 
 

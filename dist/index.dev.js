@@ -38,16 +38,17 @@ var client = new MongoClient(uri, {
 });
 
 function run() {
-  var canvasUsers, canvasPosts, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context13) {
+  var canvasUsers, canvasPosts, canvasComments, canvasAnnounce;
+  return regeneratorRuntime.async(function run$(_context14) {
     while (1) {
-      switch (_context13.prev = _context13.next) {
+      switch (_context14.prev = _context14.next) {
         case 0:
           try {
             // Connect the client to the server	(optional starting in v4.7)
             client.connect();
             canvasUsers = client.db('chatCanvas').collection('users');
             canvasPosts = client.db('chatCanvas').collection('test');
+            canvasComments = client.db('chatCanvas').collection('comments');
             canvasAnnounce = client.db('chatCanvas').collection('announcement');
             /**
              * ****************************************************************
@@ -331,14 +332,10 @@ function run() {
                       _context9.prev = 0;
                       key = req.params.key;
                       query = {
-                        "$or": [// { "post.title": { $regex: key, $options: "i" } },
-                        // { "post.description": { $regex: key, $options: "i" } },
-                        {
-                          "tag": {
-                            $regex: key,
-                            $options: "i"
-                          }
-                        }]
+                        "tag": {
+                          $regex: key,
+                          $options: "i"
+                        }
                       };
                       _context9.next = 5;
                       return regeneratorRuntime.awrap(canvasPosts.find(query).toArray());
@@ -483,6 +480,35 @@ function run() {
                   }
                 }
               }, null, null, [[0, 9]]);
+            });
+            /** *******************************************************************
+             * ************************** Comments Api  ***************************
+             * ********************************************************************
+             */
+
+            app.get('/api/v1/comments/:pId', function _callee13(req, res) {
+              var postId, query, result;
+              return regeneratorRuntime.async(function _callee13$(_context13) {
+                while (1) {
+                  switch (_context13.prev = _context13.next) {
+                    case 0:
+                      postId = req.params.pId;
+                      query = {
+                        postId: postId
+                      };
+                      _context13.next = 4;
+                      return regeneratorRuntime.awrap(canvasComments.find(query).toArray());
+
+                    case 4:
+                      result = _context13.sent;
+                      res.send(result);
+
+                    case 6:
+                    case "end":
+                      return _context13.stop();
+                  }
+                }
+              });
             }); // Send a ping to confirm a successful connection
             // await client.db("admin").command({ ping: 1 });
             // console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -492,7 +518,7 @@ function run() {
 
         case 1:
         case "end":
-          return _context13.stop();
+          return _context14.stop();
       }
     }
   });
