@@ -47,7 +47,7 @@ function run() {
             // Connect the client to the server	(optional starting in v4.7)
             client.connect();
             canvasUsers = client.db('chatCanvas').collection('users');
-            canvasPosts = client.db('chatCanvas').collection('test');
+            canvasPosts = client.db('chatCanvas').collection('posts');
             canvasPostTest = client.db('chatCanvas').collection('posts');
             canvasComments = client.db('chatCanvas').collection('comments');
             canvasAnnounce = client.db('chatCanvas').collection('announcement');
@@ -378,9 +378,39 @@ function run() {
                           $regex: key,
                           $options: "i"
                         }
-                      };
+                      }; // const result = await canvasPosts.find(query).toArray();
+
                       _context9.next = 5;
-                      return regeneratorRuntime.awrap(canvasPosts.find(query).toArray());
+                      return regeneratorRuntime.awrap(canvasPosts.aggregate([{
+                        $match: query
+                      }, {
+                        $lookup: {
+                          from: 'comments',
+                          "let": {
+                            postId: '$_id'
+                          },
+                          pipeline: [{
+                            $match: {
+                              $expr: {
+                                $eq: ['$postId', {
+                                  $toString: '$$postId'
+                                }]
+                              }
+                            }
+                          }],
+                          as: 'comments'
+                        }
+                      }, {
+                        $addFields: {
+                          commentCount: {
+                            $size: '$comments'
+                          }
+                        }
+                      }, {
+                        $sort: {
+                          postTime: -1
+                        }
+                      }]).toArray());
 
                     case 5:
                       result = _context9.sent;
@@ -411,7 +441,7 @@ function run() {
                       _context10.prev = 0;
                       page = parseInt(req.query.page) || 0;
                       size = 5;
-                      search = req.query.search;
+                      search = req.query.search || '';
                       query = {
                         "$or": [{
                           "post.title": {
@@ -429,11 +459,52 @@ function run() {
                             $options: "i"
                           }
                         }]
-                      };
+                      }; // const result = await canvasPosts.find(query)
+                      //     .sort({ postTime: -1 })
+                      //     .skip(size * page)
+                      //     .limit(size)
+                      //     .toArray()
+
                       _context10.next = 7;
-                      return regeneratorRuntime.awrap(canvasPosts.find(query).sort({
-                        postTime: -1
-                      }).skip(size * page).limit(size).toArray());
+                      return regeneratorRuntime.awrap(canvasPosts.aggregate([{
+                        $match: query
+                      }, {
+                        $lookup: {
+                          from: 'comments',
+                          "let": {
+                            postId: '$_id'
+                          },
+                          pipeline: [{
+                            $match: {
+                              $expr: {
+                                $eq: ['$postId', {
+                                  $toString: '$$postId'
+                                }]
+                              }
+                            }
+                          }],
+                          as: 'comments'
+                        }
+                      }, {
+                        $addFields: {
+                          commentCount: {
+                            $size: '$comments'
+                          }
+                        }
+                      }, {
+                        $sort: {
+                          postTime: -1
+                        }
+                      }, {
+                        $skip: page * size
+                      }, {
+                        $limit: size
+                      }, {
+                        $project: {
+                          comments: 0 // Exclude comments array from the result
+
+                        }
+                      }]).toArray());
 
                     case 7:
                       result = _context10.sent;
@@ -493,11 +564,11 @@ function run() {
                   switch (_context12.prev = _context12.next) {
                     case 0:
                       _context12.prev = 0;
-                      id = req.params.id;
+                      id = req.params.id; // const query = { _id: id }
+
                       query = {
-                        _id: id
-                      }; // let query = {_id: new ObjectId(id)};
-                      // console.log(" query = {}: ",query);
+                        _id: new ObjectId(id)
+                      }; // console.log(" query = {}: ",query);
 
                       _context12.next = 5;
                       return regeneratorRuntime.awrap(canvasPosts.findOne(query));

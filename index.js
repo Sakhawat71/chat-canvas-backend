@@ -35,7 +35,7 @@ async function run() {
         client.connect();
 
         const canvasUsers = client.db('chatCanvas').collection('users');
-        const canvasPosts = client.db('chatCanvas').collection('test');
+        const canvasPosts = client.db('chatCanvas').collection('posts');
         const canvasPostTest = client.db('chatCanvas').collection('posts');
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
@@ -177,7 +177,7 @@ async function run() {
                 const size = 10;
 
                 const result = await canvasPostTest.aggregate([
-                    
+
                     // {
                     //     $lookup: {
                     //         from: 'comments',
@@ -221,7 +221,7 @@ async function run() {
                             comments: 0 // Exclude comments array from the result
                         }
                     }
-                    
+
                 ]).toArray()
 
                 res.send(result)
@@ -239,7 +239,37 @@ async function run() {
                 const query = {
                     "tag": { $regex: key, $options: "i" }
                 }
-                const result = await canvasPosts.find(query).toArray();
+                // const result = await canvasPosts.find(query).toArray();
+                const result = await canvasPosts.aggregate([
+                    {
+                        $match: query
+                    },
+                    {
+                        $lookup: {
+                            from: 'comments',
+                            let: { postId: '$_id' },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ['$postId', { $toString: '$$postId' }]
+                                        }
+                                    }
+                                }
+                            ],
+                            as: 'comments'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            commentCount: { $size: '$comments' }
+                        }
+                    },
+                    {
+                        $sort: { postTime: -1 }
+                    }
+
+                ]).toArray()
                 res.send(result)
 
             } catch (error) {
@@ -254,7 +284,7 @@ async function run() {
 
                 const page = parseInt(req.query.page) || 0;
                 const size = 5;
-                const search = req.query.search;
+                const search = req.query.search || '';
 
                 const query = {
                     "$or": [
@@ -264,12 +294,52 @@ async function run() {
                     ]
                 }
 
-                const result = await canvasPosts.find(query)
-                    .sort({ postTime: -1 })
-                    .skip(size * page)
-                    .limit(size)
-                    .toArray()
+                // const result = await canvasPosts.find(query)
+                //     .sort({ postTime: -1 })
+                //     .skip(size * page)
+                //     .limit(size)
+                //     .toArray()
+                const result = await canvasPosts.aggregate([
+                    {
+                        $match: query
+                    },
+                    {
+                        $lookup: {
+                            from: 'comments',
+                            let: { postId: '$_id' },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ['$postId', { $toString: '$$postId' }]
+                                        }
+                                    }
+                                }
+                            ],
+                            as: 'comments'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            commentCount: { $size: '$comments' }
+                        }
+                    },
+                    {
+                        $sort: { postTime: -1 }
+                    },
+                    {
+                        $skip: page * size
+                    },
+                    {
+                        $limit: size
+                    },
+                    {
+                        $project: {
+                            comments: 0 // Exclude comments array from the result
+                        }
+                    }
 
+                ]).toArray()
                 res.send(result)
 
             } catch (error) {
@@ -297,8 +367,8 @@ async function run() {
             try {
 
                 const id = req.params.id;
-                const query = { _id: id }
-                // let query = {_id: new ObjectId(id)};
+                // const query = { _id: id }
+                let query = {_id: new ObjectId(id)};
                 // console.log(" query = {}: ",query);
 
                 const result = await canvasPosts.findOne(query);
