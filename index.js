@@ -40,8 +40,6 @@ async function run() {
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
 
-
-
         /**
          * ****************************************************************
          * ************************ User Releted Api **********************
