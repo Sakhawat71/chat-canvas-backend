@@ -36,7 +36,7 @@ async function run() {
 
         const canvasUsers = client.db('chatCanvas').collection('users');
         const canvasPosts = client.db('chatCanvas').collection('posts');
-        const canvasPostTest = client.db('chatCanvas').collection('posts');
+        const canvasPostTest = client.db('chatCanvas').collection('test');
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
 
@@ -182,7 +182,7 @@ async function run() {
                     //     $lookup: {
                     //         from: 'comments',
                     //         localField: '_id',
-                    //         foreignField: `new ObjectId('${postId}')`,
+                    //         foreignField: 'postId',
                     //         as: 'comments'
                     //     }
                     // },
@@ -368,7 +368,7 @@ async function run() {
 
                 const id = req.params.id;
                 // const query = { _id: id }
-                let query = {_id: new ObjectId(id)};
+                let query = { _id: new ObjectId(id) };
                 // console.log(" query = {}: ",query);
 
                 const result = await canvasPosts.findOne(query);
@@ -390,7 +390,15 @@ async function run() {
 
             const postId = req.params.pId;
             const query = { postId: postId }
-            const result = await canvasComments.find(query).toArray()
+            const result = await canvasComments.find(query)
+                .sort({commentTime : -1}).
+                toArray()
+            res.send(result)
+        })
+
+        app.post('/api/v1/add-comment', async (req, res) => {
+            const newComment = req.body;
+            const result = await canvasComments.insertOne(newComment);
             res.send(result)
         })
 

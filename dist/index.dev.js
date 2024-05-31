@@ -39,16 +39,16 @@ var client = new MongoClient(uri, {
 
 function run() {
   var canvasUsers, canvasPosts, canvasPostTest, canvasComments, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context14) {
+  return regeneratorRuntime.async(function run$(_context15) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context15.prev = _context15.next) {
         case 0:
           try {
             // Connect the client to the server	(optional starting in v4.7)
             client.connect();
             canvasUsers = client.db('chatCanvas').collection('users');
             canvasPosts = client.db('chatCanvas').collection('posts');
-            canvasPostTest = client.db('chatCanvas').collection('posts');
+            canvasPostTest = client.db('chatCanvas').collection('test');
             canvasComments = client.db('chatCanvas').collection('comments');
             canvasAnnounce = client.db('chatCanvas').collection('announcement');
             /**
@@ -304,7 +304,7 @@ function run() {
                       //     $lookup: {
                       //         from: 'comments',
                       //         localField: '_id',
-                      //         foreignField: `new ObjectId('${postId}')`,
+                      //         foreignField: 'postId',
                       //         as: 'comments'
                       //     }
                       // },
@@ -610,7 +610,9 @@ function run() {
                         postId: postId
                       };
                       _context13.next = 4;
-                      return regeneratorRuntime.awrap(canvasComments.find(query).toArray());
+                      return regeneratorRuntime.awrap(canvasComments.find(query).sort({
+                        commentTime: -1
+                      }).toArray());
 
                     case 4:
                       result = _context13.sent;
@@ -619,6 +621,27 @@ function run() {
                     case 6:
                     case "end":
                       return _context13.stop();
+                  }
+                }
+              });
+            });
+            app.post('/api/v1/add-comment', function _callee14(req, res) {
+              var newComment, result;
+              return regeneratorRuntime.async(function _callee14$(_context14) {
+                while (1) {
+                  switch (_context14.prev = _context14.next) {
+                    case 0:
+                      newComment = req.body;
+                      _context14.next = 3;
+                      return regeneratorRuntime.awrap(canvasComments.insertOne(newComment));
+
+                    case 3:
+                      result = _context14.sent;
+                      res.send(result);
+
+                    case 5:
+                    case "end":
+                      return _context14.stop();
                   }
                 }
               });
@@ -631,7 +654,7 @@ function run() {
 
         case 1:
         case "end":
-          return _context14.stop();
+          return _context15.stop();
       }
     }
   });
