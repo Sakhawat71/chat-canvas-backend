@@ -23,7 +23,8 @@ var jwt = require('jsonwebtoken');
 
 var PORT = process.env.PORT || 5000;
 app.use(cors({
-  origin: ['http://localhost:5173'],
+  origin: ['http://localhost:5173', 'https://chat-canvas-71.web.app' // 'https://chat-canvas-client.web.app'
+  ],
   credentials: true
 }));
 app.use(express.json());
