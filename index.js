@@ -4,9 +4,10 @@ const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const stripe = require('stripe')(process.env.STRIPE_Secret_key)
 const PORT = process.env.PORT || 5000;
 
-
+// console.log(stripe._api.auth);
 app.use(cors({
     origin: [
         'http://localhost:5173',
@@ -28,6 +29,7 @@ const client = new MongoClient(uri, {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
+        // serverSelectionTimeoutMS: 5000
     }
 });
 
@@ -391,7 +393,7 @@ async function run() {
             const postId = req.params.pId;
             const query = { postId: postId }
             const result = await canvasComments.find(query)
-                .sort({commentTime : -1}).
+                .sort({ commentTime: -1 }).
                 toArray()
             res.send(result)
         })
@@ -402,12 +404,40 @@ async function run() {
             res.send(result)
         })
 
+        /**
+         * ****************************************************************
+         * ********************   Stripe for Payment   ********************
+         * ****************************************************************
+        */
+
+        app.post('/api/v1/create-payment-intent', async (req, res) => {
+
+            try {
+                const { price } = req.body;
+                const amount = price * 100;
+
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: amount,
+                    currency: 'usd',
+                    payment_method_types: [
+                        "card"
+                    ]
+                })
+
+                res.send({
+                    clientSecret: paymentIntent.client_secret,
+                })
+            } catch (error) {
+                console.error('Error creating payment intent:', error);
+                res.status(500).send({ error: 'Failed to create payment intent' });
+            }
+        })
 
 
 
         // Send a ping to confirm a successful connection
-        // await client.db("admin").command({ ping: 1 });
-        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
