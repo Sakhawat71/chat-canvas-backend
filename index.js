@@ -134,6 +134,29 @@ async function run() {
             res.send(result);
         })
 
+        // update user
+        app.patch('/api/v1/update-user/:email', async (req, res) => {
+            try {
+                const userEmail = req.params.email;
+
+                const filter = {
+                    email: userEmail
+                };
+
+                const updateDoc = {
+                    $set : {
+                        badge : "gold"
+                    }
+                }
+
+                const result = await canvasUsers.updateOne(filter,updateDoc);
+                res.send(result)
+
+            } catch (error) {
+                console.log(error);
+            }
+        })
+
         /**
          * ****************************************************************
          * *********************** Admin Announcement Api *****************
