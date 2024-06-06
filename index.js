@@ -44,9 +44,29 @@ async function run() {
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
 
+
+
         /**
          * ****************************************************************
-         * ************************ User Releted Api **********************
+         * ************************** Middleware **************************
+         * ****************************************************************
+        */
+
+
+
+        /**
+        * 1. TODO : verifyToken middleware  
+        * 2. TODO : verifyAdmin middleware
+        * 3. ToDo : 
+        * 
+        */
+
+
+
+
+        /**
+         * ****************************************************************
+         * ************************ JWT Releted Api **********************
          * ****************************************************************
         */
 
@@ -68,7 +88,6 @@ async function run() {
                 .send({ seccess: true })
         })
 
-
         // remove jwt token
         app.get('/api/v1/remove-jwt', async (req, res) => {
             try {
@@ -83,6 +102,13 @@ async function run() {
                 res.status(500).send(err)
             }
         })
+
+
+        /**
+         * ****************************************************************
+         * ************************ User Releted Api **********************
+         * ****************************************************************
+        */
 
         // add user 
         app.put("/api/v1/add-user/:email", async (req, res) => {
@@ -113,7 +139,6 @@ async function run() {
         })
 
         // get user 
-
         app.get("/api/v1/all-users", async (req, res) => {
             try {
 
@@ -144,12 +169,12 @@ async function run() {
                 };
 
                 const updateDoc = {
-                    $set : {
-                        badge : "gold"
+                    $set: {
+                        badge: "gold"
                     }
                 }
 
-                const result = await canvasUsers.updateOne(filter,updateDoc);
+                const result = await canvasUsers.updateOne(filter, updateDoc);
                 res.send(result)
 
             } catch (error) {
@@ -159,7 +184,7 @@ async function run() {
 
         /**
          * ****************************************************************
-         * *********************** Admin Announcement Api *****************
+         * ************************** Admin Api ***************************
          * ****************************************************************
         */
 
@@ -187,6 +212,21 @@ async function run() {
                 res.status(500).send('Error fetching announcement count');
             }
 
+        })
+
+        // admin check
+        app.get('/api/v1/admin/:email', async(req,res) => {
+            
+            const email = req.params.email;
+            const query = {email : email}
+
+            const user = await canvasUsers.findOne(query);
+            
+            let admin = false;
+            if(user){
+                admin = user?.role === 'admin';
+            }
+            res.send({admin})
         })
 
         /**
@@ -404,6 +444,9 @@ async function run() {
                 console.log(error.message);
             }
         })
+
+        // recent 3 posts for user profile
+        // TODO: get recent 3 post **
 
 
         /** *******************************************************************

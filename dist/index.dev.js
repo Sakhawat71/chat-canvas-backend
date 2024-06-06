@@ -44,11 +44,11 @@ var client = new MongoClient(uri, {
 
 function run() {
   var canvasUsers, canvasPosts, canvasPostTest, canvasComments, canvasAnnounce;
-  return regeneratorRuntime.async(function run$(_context17) {
+  return regeneratorRuntime.async(function run$(_context18) {
     while (1) {
-      switch (_context17.prev = _context17.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
-          _context17.prev = 0;
+          _context18.prev = 0;
           // Connect the client to the server	(optional starting in v4.7)
           client.connect();
           canvasUsers = client.db('chatCanvas').collection('users');
@@ -58,7 +58,20 @@ function run() {
           canvasAnnounce = client.db('chatCanvas').collection('announcement');
           /**
            * ****************************************************************
-           * ************************ User Releted Api **********************
+           * ************************** Middleware **************************
+           * ****************************************************************
+          */
+
+          /**
+          * 1. TODO : verifyToken middleware  
+          * 2. TODO : verifyAdmin middleware
+          * 3. ToDo : 
+          * 
+          */
+
+          /**
+           * ****************************************************************
+           * ************************ JWT Releted Api **********************
            * ****************************************************************
           */
           // jwt access token
@@ -112,7 +125,13 @@ function run() {
                 }
               }
             });
-          }); // add user 
+          });
+          /**
+           * ****************************************************************
+           * ************************ User Releted Api **********************
+           * ****************************************************************
+          */
+          // add user 
 
           app.put("/api/v1/add-user/:email", function _callee3(req, res) {
             var email, user, filter, options, isExist, result;
@@ -263,7 +282,7 @@ function run() {
           });
           /**
            * ****************************************************************
-           * *********************** Admin Announcement Api *****************
+           * ************************** Admin Api ***************************
            * ****************************************************************
           */
 
@@ -325,6 +344,38 @@ function run() {
                 }
               }
             }, null, null, [[0, 8]]);
+          }); // admin check
+
+          app.get('/api/v1/admin/:email', function _callee9(req, res) {
+            var email, query, user, admin;
+            return regeneratorRuntime.async(function _callee9$(_context9) {
+              while (1) {
+                switch (_context9.prev = _context9.next) {
+                  case 0:
+                    email = req.params.email;
+                    query = {
+                      email: email
+                    };
+                    _context9.next = 4;
+                    return regeneratorRuntime.awrap(canvasUsers.findOne(query));
+
+                  case 4:
+                    user = _context9.sent;
+                    admin = false;
+
+                    if (user) {
+                      admin = user.role === 'admin';
+                    }
+
+                    console.log(email);
+                    res.send(email);
+
+                  case 9:
+                  case "end":
+                    return _context9.stop();
+                }
+              }
+            });
           });
           /**
            * ****************************************************************
@@ -333,16 +384,16 @@ function run() {
           */
           // get all post ** not in use ** old v1 all posts router
 
-          app.get("/api/v1/posts", function _callee9(req, res) {
+          app.get("/api/v1/posts", function _callee10(req, res) {
             var page, size, result;
-            return regeneratorRuntime.async(function _callee9$(_context9) {
+            return regeneratorRuntime.async(function _callee10$(_context10) {
               while (1) {
-                switch (_context9.prev = _context9.next) {
+                switch (_context10.prev = _context10.next) {
                   case 0:
-                    _context9.prev = 0;
+                    _context10.prev = 0;
                     page = parseInt(req.query.page) || 0;
                     size = 10;
-                    _context9.next = 5;
+                    _context10.next = 5;
                     return regeneratorRuntime.awrap(canvasPostTest.aggregate([// {
                     //     $lookup: {
                     //         from: 'comments',
@@ -390,31 +441,31 @@ function run() {
                     }]).toArray());
 
                   case 5:
-                    result = _context9.sent;
+                    result = _context10.sent;
                     res.send(result);
-                    _context9.next = 12;
+                    _context10.next = 12;
                     break;
 
                   case 9:
-                    _context9.prev = 9;
-                    _context9.t0 = _context9["catch"](0);
-                    console.log('get error : ', _context9.t0);
+                    _context10.prev = 9;
+                    _context10.t0 = _context10["catch"](0);
+                    console.log('get error : ', _context10.t0);
 
                   case 12:
                   case "end":
-                    return _context9.stop();
+                    return _context10.stop();
                 }
               }
             }, null, null, [[0, 9]]);
           }); // search api **  use for tag
 
-          app.get("/api/v1/search/:key", function _callee10(req, res) {
+          app.get("/api/v1/search/:key", function _callee11(req, res) {
             var key, query, result;
-            return regeneratorRuntime.async(function _callee10$(_context10) {
+            return regeneratorRuntime.async(function _callee11$(_context11) {
               while (1) {
-                switch (_context10.prev = _context10.next) {
+                switch (_context11.prev = _context11.next) {
                   case 0:
-                    _context10.prev = 0;
+                    _context11.prev = 0;
                     key = req.params.key;
                     query = {
                       "tag": {
@@ -423,7 +474,7 @@ function run() {
                       }
                     }; // const result = await canvasPosts.find(query).toArray();
 
-                    _context10.next = 5;
+                    _context11.next = 5;
                     return regeneratorRuntime.awrap(canvasPosts.aggregate([{
                       $match: query
                     }, {
@@ -456,32 +507,32 @@ function run() {
                     }]).toArray());
 
                   case 5:
-                    result = _context10.sent;
+                    result = _context11.sent;
                     res.send(result);
-                    _context10.next = 13;
+                    _context11.next = 13;
                     break;
 
                   case 9:
-                    _context10.prev = 9;
-                    _context10.t0 = _context10["catch"](0);
-                    console.error("Error searching posts:", _context10.t0);
+                    _context11.prev = 9;
+                    _context11.t0 = _context11["catch"](0);
+                    console.error("Error searching posts:", _context11.t0);
                     res.status(500).send("Error searching posts");
 
                   case 13:
                   case "end":
-                    return _context10.stop();
+                    return _context11.stop();
                 }
               }
             }, null, null, [[0, 9]]);
           }); // all posts and search post 
 
-          app.get('/api/v2/posts', function _callee11(req, res) {
+          app.get('/api/v2/posts', function _callee12(req, res) {
             var page, size, search, query, result;
-            return regeneratorRuntime.async(function _callee11$(_context11) {
+            return regeneratorRuntime.async(function _callee12$(_context12) {
               while (1) {
-                switch (_context11.prev = _context11.next) {
+                switch (_context12.prev = _context12.next) {
                   case 0:
-                    _context11.prev = 0;
+                    _context12.prev = 0;
                     page = parseInt(req.query.page) || 0;
                     size = 5;
                     search = req.query.search || '';
@@ -508,7 +559,7 @@ function run() {
                     //     .limit(size)
                     //     .toArray()
 
-                    _context11.next = 7;
+                    _context12.next = 7;
                     return regeneratorRuntime.awrap(canvasPosts.aggregate([{
                       $match: query
                     }, {
@@ -550,141 +601,143 @@ function run() {
                     }]).toArray());
 
                   case 7:
-                    result = _context11.sent;
+                    result = _context12.sent;
                     res.send(result);
-                    _context11.next = 15;
+                    _context12.next = 15;
                     break;
 
                   case 11:
-                    _context11.prev = 11;
-                    _context11.t0 = _context11["catch"](0);
+                    _context12.prev = 11;
+                    _context12.t0 = _context12["catch"](0);
                     res.status(500).send("Error fetching posts");
-                    console.log("Error fetching posts ", _context11.t0);
+                    console.log("Error fetching posts ", _context12.t0);
 
                   case 15:
                   case "end":
-                    return _context11.stop();
+                    return _context12.stop();
                 }
               }
             }, null, null, [[0, 11]]);
           }); // total POST count
 
-          app.get('/api/v1/post-count', function _callee12(req, res) {
+          app.get('/api/v1/post-count', function _callee13(req, res) {
             var count, totalPost;
-            return regeneratorRuntime.async(function _callee12$(_context12) {
-              while (1) {
-                switch (_context12.prev = _context12.next) {
-                  case 0:
-                    _context12.prev = 0;
-                    _context12.next = 3;
-                    return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
-
-                  case 3:
-                    count = _context12.sent;
-                    totalPost = count.toString();
-                    res.send(totalPost);
-                    _context12.next = 12;
-                    break;
-
-                  case 8:
-                    _context12.prev = 8;
-                    _context12.t0 = _context12["catch"](0);
-                    console.error("Error fetching count:", _context12.t0);
-                    res.status(500).send("Error fetching count");
-
-                  case 12:
-                  case "end":
-                    return _context12.stop();
-                }
-              }
-            }, null, null, [[0, 8]]);
-          }); // get sigele post
-
-          app.get('/api/v1/post-details/:id', function _callee13(req, res) {
-            var id, query, result;
             return regeneratorRuntime.async(function _callee13$(_context13) {
               while (1) {
                 switch (_context13.prev = _context13.next) {
                   case 0:
                     _context13.prev = 0;
+                    _context13.next = 3;
+                    return regeneratorRuntime.awrap(canvasPosts.estimatedDocumentCount());
+
+                  case 3:
+                    count = _context13.sent;
+                    totalPost = count.toString();
+                    res.send(totalPost);
+                    _context13.next = 12;
+                    break;
+
+                  case 8:
+                    _context13.prev = 8;
+                    _context13.t0 = _context13["catch"](0);
+                    console.error("Error fetching count:", _context13.t0);
+                    res.status(500).send("Error fetching count");
+
+                  case 12:
+                  case "end":
+                    return _context13.stop();
+                }
+              }
+            }, null, null, [[0, 8]]);
+          }); // get sigele post
+
+          app.get('/api/v1/post-details/:id', function _callee14(req, res) {
+            var id, query, result;
+            return regeneratorRuntime.async(function _callee14$(_context14) {
+              while (1) {
+                switch (_context14.prev = _context14.next) {
+                  case 0:
+                    _context14.prev = 0;
                     id = req.params.id; // const query = { _id: id }
 
                     query = {
                       _id: new ObjectId(id)
                     }; // console.log(" query = {}: ",query);
 
-                    _context13.next = 5;
+                    _context14.next = 5;
                     return regeneratorRuntime.awrap(canvasPosts.findOne(query));
 
                   case 5:
-                    result = _context13.sent;
+                    result = _context14.sent;
                     res.send(result);
-                    _context13.next = 13;
+                    _context14.next = 13;
                     break;
 
                   case 9:
-                    _context13.prev = 9;
-                    _context13.t0 = _context13["catch"](0);
+                    _context14.prev = 9;
+                    _context14.t0 = _context14["catch"](0);
                     res.send({
-                      error: _context13.t0
+                      error: _context14.t0
                     });
-                    console.log(_context13.t0.message);
+                    console.log(_context14.t0.message);
 
                   case 13:
                   case "end":
-                    return _context13.stop();
+                    return _context14.stop();
                 }
               }
             }, null, null, [[0, 9]]);
-          });
+          }); // recent 3 posts for user profile
+          // TODO: get recent 3 post **
+
           /** *******************************************************************
            * ************************** Comments Api  ***************************
            * ********************************************************************
           */
 
-          app.get('/api/v1/comments/:pId', function _callee14(req, res) {
+          app.get('/api/v1/comments/:pId', function _callee15(req, res) {
             var postId, query, result;
-            return regeneratorRuntime.async(function _callee14$(_context14) {
+            return regeneratorRuntime.async(function _callee15$(_context15) {
               while (1) {
-                switch (_context14.prev = _context14.next) {
+                switch (_context15.prev = _context15.next) {
                   case 0:
                     postId = req.params.pId;
                     query = {
                       postId: postId
                     };
-                    _context14.next = 4;
+                    _context15.next = 4;
                     return regeneratorRuntime.awrap(canvasComments.find(query).sort({
                       commentTime: -1
                     }).toArray());
 
                   case 4:
-                    result = _context14.sent;
+                    result = _context15.sent;
                     res.send(result);
 
                   case 6:
                   case "end":
-                    return _context14.stop();
+                    return _context15.stop();
                 }
               }
             });
           });
-          app.post('/api/v1/add-comment', function _callee15(req, res) {
+          app.post('/api/v1/add-comment', function _callee16(req, res) {
             var newComment, result;
-            return regeneratorRuntime.async(function _callee15$(_context15) {
+            return regeneratorRuntime.async(function _callee16$(_context16) {
               while (1) {
-                switch (_context15.prev = _context15.next) {
+                switch (_context16.prev = _context16.next) {
                   case 0:
                     newComment = req.body;
-                    _context15.next = 3;
+                    _context16.next = 3;
                     return regeneratorRuntime.awrap(canvasComments.insertOne(newComment));
 
                   case 3:
-                    result = _context15.sent;
+                    result = _context16.sent;
                     res.send(result);
 
                   case 5:
                   case "end":
-                    return _context15.stop();
+                    return _context16.stop();
                 }
               }
             });
@@ -695,16 +748,16 @@ function run() {
            * ****************************************************************
           */
 
-          app.post('/api/v1/create-payment-intent', function _callee16(req, res) {
+          app.post('/api/v1/create-payment-intent', function _callee17(req, res) {
             var price, amount, paymentIntent;
-            return regeneratorRuntime.async(function _callee16$(_context16) {
+            return regeneratorRuntime.async(function _callee17$(_context17) {
               while (1) {
-                switch (_context16.prev = _context16.next) {
+                switch (_context17.prev = _context17.next) {
                   case 0:
-                    _context16.prev = 0;
+                    _context17.prev = 0;
                     price = req.body.price;
                     amount = price * 100;
-                    _context16.next = 5;
+                    _context17.next = 5;
                     return regeneratorRuntime.awrap(stripe.paymentIntents.create({
                       amount: amount,
                       currency: 'usd',
@@ -712,47 +765,47 @@ function run() {
                     }));
 
                   case 5:
-                    paymentIntent = _context16.sent;
+                    paymentIntent = _context17.sent;
                     res.send({
                       clientSecret: paymentIntent.client_secret
                     });
-                    _context16.next = 13;
+                    _context17.next = 13;
                     break;
 
                   case 9:
-                    _context16.prev = 9;
-                    _context16.t0 = _context16["catch"](0);
-                    console.error('Error creating payment intent:', _context16.t0);
+                    _context17.prev = 9;
+                    _context17.t0 = _context17["catch"](0);
+                    console.error('Error creating payment intent:', _context17.t0);
                     res.status(500).send({
                       error: 'Failed to create payment intent'
                     });
 
                   case 13:
                   case "end":
-                    return _context16.stop();
+                    return _context17.stop();
                 }
               }
             }, null, null, [[0, 9]]);
           }); // Send a ping to confirm a successful connection
 
-          _context17.next = 25;
+          _context18.next = 26;
           return regeneratorRuntime.awrap(client.db("admin").command({
             ping: 1
           }));
 
-        case 25:
+        case 26:
           console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-        case 26:
-          _context17.prev = 26;
-          return _context17.finish(26);
+        case 27:
+          _context18.prev = 27;
+          return _context18.finish(27);
 
-        case 28:
+        case 29:
         case "end":
-          return _context17.stop();
+          return _context18.stop();
       }
     }
-  }, null, null, [[0,, 26, 28]]);
+  }, null, null, [[0,, 27, 29]]);
 }
 
 run()["catch"](console.dir);
