@@ -215,18 +215,18 @@ async function run() {
         })
 
         // admin check
-        app.get('/api/v1/admin/:email', async(req,res) => {
-            
+        app.get('/api/v1/admin/:email', async (req, res) => {
+
             const email = req.params.email;
-            const query = {email : email}
+            const query = { email: email }
 
             const user = await canvasUsers.findOne(query);
-            
+
             let admin = false;
-            if(user){
+            if (user) {
                 admin = user?.role === 'admin';
             }
-            res.send({admin})
+            res.send({ admin })
         })
 
         /**
@@ -413,7 +413,6 @@ async function run() {
             }
         })
 
-
         // total POST count
         app.get('/api/v1/post-count', async (req, res) => {
 
@@ -442,6 +441,20 @@ async function run() {
             } catch (error) {
                 res.send({ error })
                 console.log(error.message);
+            }
+        })
+
+        // add post
+        app.post('/api/v1/add-post', async (req, res) => {
+            try {
+
+                const post = req.body;
+                // console.log(post);
+                const result = await canvasPosts.insertOne(post);
+                res.send(result)
+
+            } catch (error) {
+                console.log(error);
             }
         })
 
