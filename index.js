@@ -458,6 +458,26 @@ async function run() {
             }
         })
 
+        app.get('/api/v1/my-posts/:email', async (req, res) => {
+            try {
+
+                const email = req.params.email;
+                const query = { 'author.email': email }
+                const projection = { _id: 1, 'post.title': 1 , upvote : 1, downvote : 1,postTime : 1};
+                const posts = await canvasPosts
+                    .find(query)
+                    .project(projection)
+                    .sort({ postTime: - 1 })
+                    .toArray();
+
+                const postCount = await canvasPosts.countDocuments(query)
+                res.send({ postCount, posts });
+
+            } catch (error) {
+                console.log(error);
+            }
+        })
+
         // recent 3 posts for user profile
         // TODO: get recent 3 post **
 
