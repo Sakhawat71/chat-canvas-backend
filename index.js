@@ -462,13 +462,13 @@ async function run() {
             }
         })
 
-        // deshboard myposts
+        // deshboard my posts and my profile recent 3
         app.get('/api/v1/my-posts/:email', async (req, res) => {
             try {
 
                 const email = req.params.email;
                 const query = { 'author.email': email }
-                const projection = { _id: 1, 'post.title': 1, upvote: 1, downvote: 1, tag: 1 };
+                const projection = { _id: 1, 'post.title': 1, upvote: 1, downvote: 1, tag: 1 ,postTime: 1};
                 const posts = await canvasPosts
                     .find(query)
                     .project(projection)
