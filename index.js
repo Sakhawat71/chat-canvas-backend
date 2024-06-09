@@ -74,18 +74,23 @@ async function run() {
         // jwt access token
         app.post("/api/v1/jwt", async (req, res) => {
 
-            const userEmail = req.body;
-            const token = jwt.sign(userEmail, process.env.ACCESS_TOKEN, {
-                expiresIn: '365d',
-            });
+            try {
+                const userEmail = req.body;
+                const token = jwt.sign(userEmail, process.env.ACCESS_TOKEN, {
+                    expiresIn: '365d',
+                });
 
-            res
-                .cookie('token', token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-                })
-                .send({ seccess: true })
+                res
+                    .cookie('token', token, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                    })
+                    .send({ seccess: true })
+            } catch (error) {
+                console.log(error);
+                res.status(500).send('error')
+            }
         })
 
         // remove jwt token
@@ -99,7 +104,8 @@ async function run() {
                 })
                     .send({ seccess: true })
             } catch (err) {
-                res.status(500).send(err)
+                console.log(err);
+                res.status(500).send({ err })
             }
         })
 
@@ -431,9 +437,7 @@ async function run() {
             try {
 
                 const id = req.params.id;
-                // const query = { _id: id }
                 let query = { _id: new ObjectId(id) };
-                // console.log(" query = {}: ",query);
 
                 const result = await canvasPosts.findOne(query);
                 res.send(result);
@@ -458,12 +462,13 @@ async function run() {
             }
         })
 
+        // deshboard myposts
         app.get('/api/v1/my-posts/:email', async (req, res) => {
             try {
 
                 const email = req.params.email;
                 const query = { 'author.email': email }
-                const projection = { _id: 1, 'post.title': 1 , upvote : 1, downvote : 1,postTime : 1};
+                const projection = { _id: 1, 'post.title': 1, upvote: 1, downvote: 1, tag: 1 };
                 const posts = await canvasPosts
                     .find(query)
                     .project(projection)
@@ -478,6 +483,19 @@ async function run() {
             }
         })
 
+        // delete post
+        app.delete('/api/v1/delete-post/:id', async (req, res) => {
+            try {
+
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
+                const result = await canvasPosts.deleteOne(query);
+                res.send(result);
+
+            } catch (error) {
+                console.log("post delete error : ", error);
+            }
+        })
         // recent 3 posts for user profile
         // TODO: get recent 3 post **
 
