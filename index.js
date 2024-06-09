@@ -184,7 +184,7 @@ async function run() {
                 res.send(result)
 
             } catch (error) {
-                console.log("can not update bornze ot gold",error);
+                console.log("can not update bornze ot gold", error);
                 res.status(500).json({ message: 'Internal server error.' });
             }
         })
@@ -199,23 +199,24 @@ async function run() {
         app.get("/api/v1/announcement", async (req, res) => {
             try {
                 const result = await canvasAnnounce.find().sort({
-                    time : -1}).toArray();
+                    time: -1
+                }).toArray();
                 res.send(result)
             } catch (error) {
                 console.log('get error : ', error);
             }
-        }) 
+        })
 
         // make annouce 
-        app.post('/api/v1/make-announcement', async(req,res) => {
-            
+        app.post('/api/v1/make-announcement', async (req, res) => {
+
             try {
                 const post = req.body;
                 const result = await canvasAnnounce.insertOne(post);
                 res.send(result)
 
             } catch (error) {
-                console.log('error to make announcement ',error);
+                console.log('error to make announcement ', error);
             }
         })
 
@@ -267,6 +268,20 @@ async function run() {
             } catch (error) {
                 console.error('Error promoting user to admin:', error);
                 res.status(500).json({ message: 'Internal server error.' });
+            }
+        })
+
+        // admin state 
+        app.get("/api/v1/admin-state", async (req, res) => {
+            try {
+                const NumOfPosts = await canvasPosts.estimatedDocumentCount()
+                const NumOfComments = await canvasComments.estimatedDocumentCount()
+                const NumOfUser = await canvasUsers.estimatedDocumentCount()
+
+                res.send({NumOfPosts,NumOfComments,NumOfUser})
+            } catch (error) {
+                console.log("cannt get state data ",error);
+                res.status(500).send({message: "can`t get state data "})
             }
         })
 
