@@ -496,8 +496,6 @@ async function run() {
                 console.log("post delete error : ", error);
             }
         })
-        // recent 3 posts for user profile
-        // TODO: get recent 3 post **
 
 
         /** *******************************************************************
