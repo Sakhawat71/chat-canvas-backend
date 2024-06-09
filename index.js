@@ -144,11 +144,11 @@ async function run() {
             }
         })
 
-        // get user 
+        // get all user  ** admin verify
         app.get("/api/v1/all-users", async (req, res) => {
             try {
 
-                const result = await canvasUsers.find().toArray();
+                const result = await canvasUsers.find().sort({ creationTime: -1 }).toArray();
                 res.send(result);
 
             } catch (error) {
@@ -184,7 +184,8 @@ async function run() {
                 res.send(result)
 
             } catch (error) {
-                console.log(error);
+                console.log("can not update bornze ot gold",error);
+                res.status(500).json({ message: 'Internal server error.' });
             }
         })
 
@@ -194,13 +195,27 @@ async function run() {
          * ****************************************************************
         */
 
+        // announce
         app.get("/api/v1/announcement", async (req, res) => {
             try {
-                const result = await canvasAnnounce.find().toArray();
-
+                const result = await canvasAnnounce.find().sort({
+                    time : -1}).toArray();
                 res.send(result)
             } catch (error) {
                 console.log('get error : ', error);
+            }
+        }) 
+
+        // make annouce 
+        app.post('/api/v1/make-announcement', async(req,res) => {
+            
+            try {
+                const post = req.body;
+                const result = await canvasAnnounce.insertOne(post);
+                res.send(result)
+
+            } catch (error) {
+                console.log('error to make announcement ',error);
             }
         })
 
@@ -233,6 +248,26 @@ async function run() {
                 admin = user?.role === 'admin';
             }
             res.send({ admin })
+        })
+
+        // make admin
+        app.patch('/api/v1/make-admin/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) }
+
+                const updateDoc = {
+                    $set: {
+                        role: "admin"
+                    }
+                }
+                const result = await canvasUsers.updateOne(query, updateDoc);
+                res.send(result)
+
+            } catch (error) {
+                console.error('Error promoting user to admin:', error);
+                res.status(500).json({ message: 'Internal server error.' });
+            }
         })
 
         /**
@@ -468,7 +503,7 @@ async function run() {
 
                 const email = req.params.email;
                 const query = { 'author.email': email }
-                const projection = { _id: 1, 'post.title': 1, upvote: 1, downvote: 1, tag: 1 ,postTime: 1};
+                const projection = { _id: 1, 'post.title': 1, upvote: 1, downvote: 1, tag: 1, postTime: 1 };
                 const posts = await canvasPosts
                     .find(query)
                     .project(projection)
