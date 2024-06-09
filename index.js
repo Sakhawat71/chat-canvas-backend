@@ -12,7 +12,7 @@ app.use(cors({
     origin: [
         'http://localhost:5173',
         'https://chat-canvas-71.web.app',
-        // 'https://chat-canvas-client.web.app'
+        'https://chat-canvas.netlify.app',
     ],
     credentials: true,
 }))
