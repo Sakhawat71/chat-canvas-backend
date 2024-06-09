@@ -272,7 +272,7 @@ async function run() {
         })
 
         // admin state 
-        app.get("/api/v1/admin-state", async (req, res) => {
+        app.get("/api/v1/admin-stats", async (req, res) => {
             try {
                 const NumOfPosts = await canvasPosts.estimatedDocumentCount()
                 const NumOfComments = await canvasComments.estimatedDocumentCount()
