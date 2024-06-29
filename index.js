@@ -21,46 +21,6 @@ app.use(express.json())
 app.use(cookieParser())
 
 
-/**
-* ****************************************************************
-* ************************** Middleware **************************
-* ****************************************************************
-*/
-
-
-const verifyToken = (req, res, next) => {
-
-    // const token = res.cookies?.token;
-    const token = req.cookies?.token;
-    console.log(token);
-
-    if (!token) {
-        return res.status(401).send({ message: 'Access Denied. No Token Provided.' });
-    }
-
-    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
-        if (err) {
-            return res.status(401).send({ message: 'Unauthorized Access' });
-        }
-        req.user = decoded;
-    })
-    next()
-};
-
-const verifyAdmin = (req, res, next) => {
-    const jwt = req.user;
-    console.log(jwt);
-    next()
-}
-
-
-/**
-* 1. DONE : verifyToken middleware
-* 2. TODO : verifyAdmin middleware
-* 
-*/
-
-
 
 
 const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.vcouptk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -86,6 +46,52 @@ async function run() {
         const canvasPostTest = client.db('chatCanvas').collection('test');
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
+
+
+
+        /**
+        * ****************************************************************
+        * ************************** Middleware **************************
+        * ****************************************************************
+        */
+
+
+        const verifyToken = (req, res, next) => {
+
+            const token = req.cookies?.token;
+            console.log(token);
+
+            if (!token) {
+                return res.status(401).send({ message: 'Access Denied. No Token Provided.' });
+            }
+
+            jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+                if (err) {
+                    return res.status(401).send({ message: 'Unauthorized Access' });
+                }
+                req.user = decoded;
+            })
+            next()
+        };
+
+        
+        const verifyAdmin = async (req, res, next) => {
+            try {
+                const jwtEmail = req.user.email;
+                const query = { email: jwtEmail };
+
+                const user = await canvasUsers.findOne(query);
+
+                if (user && user.role === 'admin') {
+                    next();
+                } else {
+                    res.status(403).send({ message: 'Access denied. Admins only.' });
+                }
+            } catch (error) {
+                console.error('Error in verifyAdmin middleware:', error);
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        };
 
 
         /**
@@ -169,7 +175,7 @@ async function run() {
         })
 
         // get all user  # admin verify
-        app.get("/api/v1/all-users", async (req, res) => {
+        app.get("/api/v1/all-users", verifyToken, verifyAdmin, async (req, res) => {
             try {
 
                 const result = await canvasUsers.find().sort({ creationTime: -1 }).toArray();
@@ -560,7 +566,7 @@ async function run() {
         // delete post
         app.delete('/api/v1/delete-post/:id', verifyToken, async (req, res) => {
             try {
-                console.log("jwt ", req.user.email);
+                // console.log("jwt ", req.user.email);
 
                 const jwtEmail = req.user.email;
                 const id = req.params.id;
@@ -590,17 +596,17 @@ async function run() {
          * ********************************************************************
         */
 
-        app.get('/api/v1/comments/:pId', async (req, res) => {
+        app.get('/api/v1/comments/:id', async (req, res) => {
 
-            const postId = req.params.pId;
-            const query = { postId: postId }
+            const post_id = req.params.id;
+            const query = { postId: post_id }
             const result = await canvasComments.find(query)
                 .sort({ commentTime: -1 }).
                 toArray()
             res.send(result)
         })
 
-        app.post('/api/v1/add-comment', async (req, res) => {
+        app.post('/api/v1/add-comment', verifyToken, async (req, res) => {
             const newComment = req.body;
             const result = await canvasComments.insertOne(newComment);
             res.send(result)
