@@ -55,7 +55,7 @@ async function run() {
         * ****************************************************************
         */
 
-
+        // verify jwt token
         const verifyToken = (req, res, next) => {
 
             const token = req.cookies?.token;
@@ -74,7 +74,7 @@ async function run() {
             next()
         };
 
-        
+        // verify is admin
         const verifyAdmin = async (req, res, next) => {
             try {
                 const jwtEmail = req.user.email;
@@ -187,7 +187,7 @@ async function run() {
         })
 
         // single user 
-        app.get("/api/v1/user/:email", async (req, res) => {
+        app.get("/api/v1/user/:email", verifyToken, async (req, res) => {
             const userEmail = req.params.email;
             const query = { email: userEmail }
 
@@ -196,7 +196,7 @@ async function run() {
         })
 
         // update user
-        app.patch('/api/v1/update-user/:email', async (req, res) => {
+        app.patch('/api/v1/update-user/:email', verifyToken, async (req, res) => {
             try {
                 const userEmail = req.params.email;
 
@@ -238,7 +238,7 @@ async function run() {
         })
 
         // make annouce 
-        app.post('/api/v1/make-announcement', async (req, res) => {
+        app.post('/api/v1/make-announcement', verifyToken, verifyAdmin, async (req, res) => {
 
             try {
                 const post = req.body;
@@ -267,7 +267,7 @@ async function run() {
         })
 
         // admin check
-        app.get('/api/v1/admin/:email', async (req, res) => {
+        app.get('/api/v1/admin/:email', verifyToken, async (req, res) => {
 
             const email = req.params.email;
             const query = { email: email }
@@ -282,7 +282,7 @@ async function run() {
         })
 
         // make admin
-        app.patch('/api/v1/make-admin/:id', async (req, res) => {
+        app.patch('/api/v1/make-admin/:id', verifyToken, verifyAdmin, async (req, res) => {
             try {
                 const id = req.params.id;
                 const query = { _id: new ObjectId(id) }
@@ -302,7 +302,7 @@ async function run() {
         })
 
         // admin state 
-        app.get("/api/v1/admin-stats", async (req, res) => {
+        app.get("/api/v1/admin-stats", verifyToken, verifyAdmin, async (req, res) => {
             try {
                 const NumOfPosts = await canvasPosts.estimatedDocumentCount()
                 const NumOfComments = await canvasComments.estimatedDocumentCount()
@@ -543,7 +543,7 @@ async function run() {
         })
 
         // deshboard my posts and my profile recent 3
-        app.get('/api/v1/my-posts/:email', async (req, res) => {
+        app.get('/api/v1/my-posts/:email', verifyToken, async (req, res) => {
             try {
 
                 const email = req.params.email;
@@ -596,7 +596,7 @@ async function run() {
          * ********************************************************************
         */
 
-        app.get('/api/v1/comments/:id', async (req, res) => {
+        app.get('/api/v1/comments/:id', verifyToken, async (req, res) => {
 
             const post_id = req.params.id;
             const query = { postId: post_id }
@@ -618,7 +618,7 @@ async function run() {
          * ****************************************************************
         */
 
-        app.post('/api/v1/create-payment-intent', async (req, res) => {
+        app.post('/api/v1/create-payment-intent', verifyToken, async (req, res) => {
 
             try {
                 const { price } = req.body;
