@@ -4,6 +4,7 @@ const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const stripe = require('stripe')(process.env.STRIPE_Secret_key)
 const PORT = process.env.PORT || 5000;
 
@@ -17,6 +18,48 @@ app.use(cors({
     credentials: true,
 }))
 app.use(express.json())
+app.use(cookieParser())
+
+
+/**
+* ****************************************************************
+* ************************** Middleware **************************
+* ****************************************************************
+*/
+
+
+const verifyToken = (req, res, next) => {
+
+    // const token = res.cookies?.token;
+    const token = req.cookies?.token;
+    console.log(token);
+
+    if (!token) {
+        return res.status(401).send({ message: 'Access Denied. No Token Provided.' });
+    }
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: 'Unauthorized Access' });
+        }
+        req.user = decoded;
+    })
+    next()
+};
+
+const verifyAdmin = (req, res, next) => {
+    const jwt = req.user;
+    console.log(jwt);
+    next()
+}
+
+
+/**
+* 1. DONE : verifyToken middleware
+* 2. TODO : verifyAdmin middleware
+* 
+*/
+
 
 
 
@@ -43,12 +86,6 @@ async function run() {
         const canvasPostTest = client.db('chatCanvas').collection('test');
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
-
-
-
-
-
-
 
 
         /**
@@ -131,7 +168,7 @@ async function run() {
             }
         })
 
-        // get all user  ** admin verify
+        // get all user  # admin verify
         app.get("/api/v1/all-users", async (req, res) => {
             try {
 
@@ -265,10 +302,10 @@ async function run() {
                 const NumOfComments = await canvasComments.estimatedDocumentCount()
                 const NumOfUser = await canvasUsers.estimatedDocumentCount()
 
-                res.send({NumOfPosts,NumOfComments,NumOfUser})
+                res.send({ NumOfPosts, NumOfComments, NumOfUser })
             } catch (error) {
-                console.log("cannt get state data ",error);
-                res.status(500).send({message: "can`t get state data "})
+                console.log("cannt get state data ", error);
+                res.status(500).send({ message: "can`t get state data " })
             }
         })
 
@@ -387,7 +424,7 @@ async function run() {
         })
 
         // all posts and search post 
-        app.get('/api/v2/posts', async (req, res) => {
+        app.get('/api/v2/posts', verifyToken, async (req, res) => {
             try {
 
                 const page = parseInt(req.query.page) || 0;
@@ -486,7 +523,7 @@ async function run() {
         })
 
         // add post
-        app.post('/api/v1/add-post', async (req, res) => {
+        app.post('/api/v1/add-post', verifyToken, async (req, res) => {
             try {
 
                 const post = req.body;
@@ -521,11 +558,24 @@ async function run() {
         })
 
         // delete post
-        app.delete('/api/v1/delete-post/:id', async (req, res) => {
+        app.delete('/api/v1/delete-post/:id', verifyToken, async (req, res) => {
             try {
+                console.log("jwt ", req.user.email);
 
+                const jwtEmail = req.user.email;
                 const id = req.params.id;
                 const query = { _id: new ObjectId(id) };
+
+
+                const post = await canvasPosts.findOne(query);
+                if (!post) {
+                    return res.status(404).send({ message: 'Post not found' });
+                }
+
+                if (post?.author.email !== jwtEmail) {
+                    return res.status(403).send({ message: 'Access denied. You are not authorized to delete this post.' });
+                }
+
                 const result = await canvasPosts.deleteOne(query);
                 res.send(result);
 
@@ -608,19 +658,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`)
 })
-
-
-        /**
-         * ****************************************************************
-         * ************************** Middleware **************************
-         * ****************************************************************
-        */
-
-
-
-        /**
-        * 1. TODO : verifyToken middleware  
-        * 2. TODO : verifyAdmin middleware
-        * 3. ToDo : 
-        * 
-        */
