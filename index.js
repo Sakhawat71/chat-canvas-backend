@@ -59,7 +59,6 @@ async function run() {
         const verifyToken = (req, res, next) => {
 
             const token = req.cookies?.token;
-            console.log(token);
 
             if (!token) {
                 return res.status(401).send({ message: 'Access Denied. No Token Provided.' });
