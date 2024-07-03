@@ -315,8 +315,15 @@ async function run() {
         })
 
         // reported comments
-        app.get("/api/v1/reported-comments", async (req, res) => {
+        app.get("/api/v1/reported-comments",verifyToken, verifyAdmin, async (req, res) => {
+            try {
 
+                const result = await reportedComments.find().sort({reportedAt : -1}).toArray()
+                res.send(result)
+
+            } catch (error) {
+                console.log('error for reported comments api : ', error);
+            }
         })
 
         /**
@@ -617,7 +624,7 @@ async function run() {
         })
 
         // report to admin
-        app.post("/api/v1/send-report", async (req, res) => {
+        app.post("/api/v1/send-report", verifyToken, async (req, res) => {
 
             try {
                 const report = req.body;
@@ -630,7 +637,7 @@ async function run() {
                 }
 
                 const result = await reportedComments.insertOne(report);
-                res.send(result)
+                res.send(result);
             } catch (error) {
                 console.error('Error reporting comment:', error);
                 res.send({ acknowledged: false, message: "Internal server error" });
