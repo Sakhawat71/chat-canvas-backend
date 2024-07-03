@@ -344,6 +344,19 @@ async function run() {
         })
 
         //delete comment 
+        app.delete("/api/v1/delete-comment/:id",verifyToken,verifyAdmin, async(req,res) => {
+            try {
+                
+                const id = req.params.id;
+                const query = {_id : new ObjectId(id)}
+
+                const result = await canvasComments.deleteOne(query);
+                res.send(result);
+
+            } catch (error) {
+                console.log(error);
+            }
+        })
 
         /**
          * ****************************************************************
