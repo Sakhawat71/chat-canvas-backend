@@ -332,9 +332,6 @@ async function run() {
                 const id = req.params.id;
                 const query = { _id: new ObjectId(id) }
 
-                // const find = await reportedComments.findOne(query);
-                // console.log(find);
-
                 const result = await reportedComments.deleteOne(query);
                 res.send(result)
 
