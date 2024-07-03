@@ -315,16 +315,35 @@ async function run() {
         })
 
         // reported comments
-        app.get("/api/v1/reported-comments",verifyToken, verifyAdmin, async (req, res) => {
+        app.get("/api/v1/reported-comments", verifyToken, verifyAdmin, async (req, res) => {
             try {
 
-                const result = await reportedComments.find().sort({reportedAt : -1}).toArray()
+                const result = await reportedComments.find().sort({ reportedAt: -1 }).toArray()
                 res.send(result)
 
             } catch (error) {
                 console.log('error for reported comments api : ', error);
             }
         })
+
+        // delete report 
+        app.delete("/api/v1/delete-report/:id", verifyToken, verifyAdmin, async (req, res) => {
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) }
+
+                // const find = await reportedComments.findOne(query);
+                // console.log(find);
+
+                const result = await reportedComments.deleteOne(query);
+                res.send(result)
+
+            } catch (error) {
+                console.log(error);
+            }
+        })
+
+        //delete comment 
 
         /**
          * ****************************************************************
