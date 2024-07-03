@@ -46,7 +46,7 @@ async function run() {
         const canvasPostTest = client.db('chatCanvas').collection('test');
         const canvasComments = client.db('chatCanvas').collection('comments');
         const canvasAnnounce = client.db('chatCanvas').collection('announcement');
-
+        const reportedComments = client.db('chatCanvas').collection('reportedComments');
 
 
         /**
@@ -312,6 +312,11 @@ async function run() {
                 console.log("cannt get state data ", error);
                 res.status(500).send({ message: "can`t get state data " })
             }
+        })
+
+        // reported comments
+        app.get("/api/v1/reported-comments", async (req, res) => {
+
         })
 
         /**
@@ -609,6 +614,28 @@ async function run() {
             const newComment = req.body;
             const result = await canvasComments.insertOne(newComment);
             res.send(result)
+        })
+
+        // report to admin
+        app.post("/api/v1/send-report", async (req, res) => {
+
+            try {
+                const report = req.body;
+                const commentId = report.commentId;
+                const reporterEmail = report.reporterEmail;
+
+                const existingReport = await reportedComments.findOne({ commentId, reporterEmail });
+                if (existingReport) {
+                    return res.send({ acknowledged: false, message: "Already reported" });
+                }
+
+                const result = await reportedComments.insertOne(report);
+                res.send(result)
+            } catch (error) {
+                console.error('Error reporting comment:', error);
+                res.send({ acknowledged: false, message: "Internal server error" });
+            }
+
         })
 
         /**
