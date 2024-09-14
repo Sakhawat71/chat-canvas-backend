@@ -470,7 +470,7 @@ async function run() {
         })
 
         // all posts and search post 
-        app.get('/api/v2/posts', verifyToken, async (req, res) => {
+        app.get('/api/v2/posts',  async (req, res) => {
             try {
 
                 const page = parseInt(req.query.page) || 0;
